@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 커스텀 글로벌 스타일 (선택) */
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', 'Segoe UI', 'Apple SD Gothic Neo', Arial, sans-serif;
+  background-color: transparent;
+}
+
+/* 네온 효과 등 커스텀 예시 */
+.drop-shadow-glow {
+  text-shadow: 0 0 16px #a5b4fc, 0 0 32px #f0abfc;
+}
+.animate-fade-in {
+  animation: fadeIn 1.2s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: none; }
+}
