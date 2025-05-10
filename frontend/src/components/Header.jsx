@@ -8,12 +8,19 @@ const isHumanityVerified = true; // 인증 여부 (실제 연동시 상태로)
 export default function Header() {
   const { login, logout, ready, authenticated, user } = usePrivy();
   const wallet =
-    typeof window !== "undefined"
+    user?.wallet?.address ||
+    (typeof window !== "undefined"
       ? window.localStorage.getItem("wallet")
-      : null;
+      : null);
   const shortWallet = wallet
-    ? wallet.slice(0, 4) + "..." + wallet.slice(-4)
+    ? wallet.slice(0, 6) + "..." + wallet.slice(-4)
     : "";
+
+  React.useEffect(() => {
+    if (user?.wallet?.address && typeof window !== "undefined") {
+      window.localStorage.setItem("wallet", user.wallet.address);
+    }
+  }, [user]);
   const [open, setOpen] = useState(false);
   const menuRef = useRef();
   const closeTimer = useRef(null);
