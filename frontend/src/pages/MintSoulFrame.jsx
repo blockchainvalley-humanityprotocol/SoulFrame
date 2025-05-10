@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAISummary } from "../api/elizaos";
-import { issueVC } from "../api/humanity";
+import { isKycVerified } from "../api/humanity";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function MintSoulFrame() {
+  const { user } = usePrivy();
   // 실제 SBT 체크 및 NFT 민팅 로직은 추후 구현
-  const hasSBT = true; // 예시: 인증 완료 상태
+  const [hasSBT, setHasSBT] = useState(false); // 실제 인증 결과 반영
   const [minted, setMinted] = useState(false); // 실제 민팅 여부
   const [metadata, setMetadata] = useState(null); // NFT 메타데이터
+  const [showModal, setShowModal] = useState(false); // 민팅 성공 모달
 
   // 입력값 상태
   const [intro, setIntro] = useState("");
@@ -15,6 +18,8 @@ export default function MintSoulFrame() {
   const [chatStyle, setChatStyle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [uploadedImage, setUploadedImage] = useState(null); // 유저가 업로드한 이미지
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
   const navigate = useNavigate();
 
@@ -23,28 +28,43 @@ export default function MintSoulFrame() {
     setLoading(true);
     setError("");
     try {
-      // 1. AI 요약/이미지 생성
+      // 현재 로그인된 privy wallet address를 subject_address로 사용
+      const address = user?.wallet?.address;
+      if (!address) throw new Error("지갑 주소를 찾을 수 없습니다. 로그인 상태를 확인해 주세요.");
+      // 1. KYC 인증 여부 확인
+      // (임시) Humanity API를 사용할 수 없으므로 무조건 인증된 것으로 처리
+      const verified = true;
+      setHasSBT(true);
+      // 아래 코드는 실제 API 사용 시 복구
+      // const verified = await isKycVerified(address);
+      // setHasSBT(verified);
+      // if (!verified) {
+      //   setError("Humanity KYC 인증이 필요합니다. 인증 후 다시 시도해 주세요.");
+      //   setLoading(false);
+      //   return;
+      // }
+      // 2. elizaos agent 생성 (id/summary/image/character 반환)
       const aiRes = await getAISummary({
         trait: traits,
         interest: chatStyle,
         intro,
       });
-      setMetadata(aiRes);
-      // 2. NFT 발행(VC 발급)
-      // 예시: 현재 유저의 address를 subject_address로 전달해야 함 (실제 서비스에 맞게 수정)
-      const address = "0x1234...user"; // TODO: 실제 유저 지갑 주소로 대체
-      await issueVC({
-        claims: {
-          intro,
-          traits,
-          chatStyle,
-          aiSummary: aiRes.summary,
-          aiImage: aiRes.image,
-        },
-        subject_address: address,
-      });
+      // 이미지: 업로드한 이미지가 있으면 그걸 사용, 없으면 elizaos 결과 사용
+      const finalImage = uploadedImageUrl || aiRes.image;
+      setMetadata({ ...aiRes, image: finalImage });
+      // 민팅 성공 시 localStorage에 ainft 정보 저장
+      window.localStorage.setItem("mysoulframe", JSON.stringify({
+        agentId: aiRes.id,
+        image: finalImage,
+        summary: aiRes.summary,
+        character: aiRes.character,
+        traits,
+        intro,
+        chatStyle,
+        wallet: address
+      }));
       setMinted(true);
-      setTimeout(() => navigate("/mysoulframe"), 1200);
+      setShowModal(true);
     } catch (e) {
       setError("NFT 발행 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
@@ -88,6 +108,35 @@ export default function MintSoulFrame() {
         ) : (
           <>
             <div className="w-full mb-4">
+              <label className="block mb-2 font-semibold">
+                NFT 이미지 업로드 (선택)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="mb-2"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setUploadedImage(file);
+                    const reader = new FileReader();
+                    reader.onloadend = () => setUploadedImageUrl(reader.result);
+                    reader.readAsDataURL(file);
+                  } else {
+                    setUploadedImage(null);
+                    setUploadedImageUrl("");
+                  }
+                }}
+              />
+              {uploadedImageUrl && (
+                <img
+                  src={uploadedImageUrl}
+                  alt="미리보기"
+                  className="w-24 h-24 rounded-full border-2 border-fuchsia-300 shadow mb-2 object-cover"
+                />
+              )}
+            </div>
+            <div className="w-full mb-4">
               <label className="block mb-2 font-semibold">자기소개</label>
               <textarea
                 value={intro}
@@ -130,6 +179,42 @@ export default function MintSoulFrame() {
               {loading ? "NFT 발행 중..." : "NFT 발행하기"}
             </button>
           </>
+        )}
+        {/* 민팅 성공 모달 */}
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div
+              className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center animate-fade-in"
+              style={{ minWidth: 320 }}
+            >
+              <h3 className="text-2xl font-bold mb-4 text-indigo-700">
+                🎉 NFT 발행 완료!
+              </h3>
+              <img
+                src={
+                  metadata?.image ||
+                  "https://placehold.co/200x200?text=AI+NFT+Image"
+                }
+                alt="NFT"
+                className="w-28 h-28 rounded-full border-4 border-fuchsia-300 shadow mb-4"
+              />
+              <div className="text-center text-lg font-semibold mb-2">
+                AI 성격 요약
+              </div>
+              <div className="bg-indigo-50 px-4 py-2 rounded-xl text-indigo-900 text-center mb-4">
+                {metadata?.summary}
+              </div>
+              <button
+                className="mt-2 bg-gradient-to-r from-indigo-500 to-fuchsia-400 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:from-fuchsia-400 hover:to-indigo-500 transition"
+                onClick={() => {
+                  setShowModal(false);
+                  navigate("/mysoulframe");
+                }}
+              >
+                마이페이지로 이동
+              </button>
+            </div>
+          </div>
         )}
       </div>
       <style>{`

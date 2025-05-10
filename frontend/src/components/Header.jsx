@@ -1,10 +1,12 @@
 import React, { useState, useRef } from "react";
+import { usePrivy } from "@privy-io/react-auth";
 
 const avatarUrl = "https://api.dicebear.com/7.x/adventurer/svg?seed=SoulFrame";
 const nickname = "hyenee3782"; // 임시 닉네임
 const isHumanityVerified = true; // 인증 여부 (실제 연동시 상태로)
 
 export default function Header({ onLogin, isLoggedIn }) {
+  const { login, logout, ready, authenticated, user } = usePrivy();
   const wallet =
     typeof window !== "undefined"
       ? window.localStorage.getItem("wallet")
@@ -49,7 +51,7 @@ export default function Header({ onLogin, isLoggedIn }) {
         </nav>
       </div>
       <div className="relative" ref={menuRef}>
-        {isLoggedIn ? (
+        {authenticated ? (
           <div
             className="flex items-center gap-2 cursor-pointer select-none"
             onMouseEnter={() => setOpen(true)}
@@ -72,7 +74,11 @@ export default function Header({ onLogin, isLoggedIn }) {
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-mono text-indigo-100 text-xs">
-                  {shortWallet}
+                  {user?.wallet?.address
+                    ? user.wallet.address.slice(0, 4) +
+                      "..." +
+                      user.wallet.address.slice(-4)
+                    : shortWallet}
                 </span>
                 {isHumanityVerified && (
                   <span className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold ml-1">
@@ -121,10 +127,7 @@ export default function Header({ onLogin, isLoggedIn }) {
                   </a>
                   <button
                     className="flex items-center gap-2 hover:bg-gray-800 rounded-lg px-3 py-2 transition text-left"
-                    onClick={() => {
-                      window.localStorage.removeItem("wallet");
-                      window.location.reload();
-                    }}
+                    onClick={logout}
                   >
                     <span className="text-lg">⏏️</span> Disconnect
                   </button>
@@ -136,6 +139,7 @@ export default function Header({ onLogin, isLoggedIn }) {
           <button
             className="bg-gradient-to-r from-indigo-500 to-fuchsia-400 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:from-fuchsia-400 hover:to-indigo-500 transition border border-indigo-200"
             onClick={login}
+            disabled={!ready}
           >
             Connect Wallet
           </button>

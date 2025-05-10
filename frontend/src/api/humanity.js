@@ -1,40 +1,27 @@
-// Humanity Protocol API 연동 유틸
-// 환경변수에 HUMANITY_API_TOKEN 필요
+// Humanity Protocol API 연동 함수: VC 검증(verify)만 구현
+import axios from "axios";
 
-const API_BASE = "https://issuer.humanity.org/credentials";
-
-export async function issueVC({ claims, subject_address }) {
-  const res = await fetch(`${API_BASE}/issue`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.REACT_APP_HUMANITY_API_TOKEN}`,
-    },
-    body: JSON.stringify({ claims, subject_address }),
+// 사용자의 VC 리스트를 가져옴 (GET /credentials/list)
+export async function fetchVCList(subject_address) {
+  const url = `https://issuer.humanity.org/credentials/list`;
+  // 실제 API는 인증/파라미터가 있을 수 있으나, 예시에서는 주소만 사용
+  // (실제 DID가 필요하다면 쿼리 파라미터 등으로 수정)
+  const res = await axios.get(url, {
+    params: { subject_address },
   });
-  if (!res.ok) throw new Error("VC 발급 실패");
-  return res.json();
+  return res.data; // VC 배열 반환
 }
 
-export async function revokeVC({ credentialId }) {
-  const res = await fetch(`${API_BASE}/revoke`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.REACT_APP_HUMANITY_API_TOKEN}`,
-    },
-    body: JSON.stringify({ credentialId }),
-  });
-  if (!res.ok) throw new Error("VC 폐기 실패");
-  return res.json();
-}
-
-export async function listVCs({ holderDid }) {
-  const res = await fetch(`${API_BASE}/list?holderDid=${holderDid}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.REACT_APP_HUMANITY_API_TOKEN}`,
-    },
-  });
-  if (!res.ok) throw new Error("VC 목록 조회 실패");
-  return res.json();
+// KYC 인증 여부를 반환 (true/false)
+export async function isKycVerified(subject_address) {
+  try {
+    const vcList = await fetchVCList(subject_address);
+    // claims.kyc === "passed" 인 VC가 있는지 확인
+    return (
+      Array.isArray(vcList) &&
+      vcList.some(vc => vc.claims && vc.claims.kyc === "passed")
+    );
+  } catch (e) {
+    return false; // 조회 실패 시 미인증 처리
+  }
 }

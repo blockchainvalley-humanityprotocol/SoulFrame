@@ -2,14 +2,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export default function MySoulFrame() {
-  // 실제 데이터 및 검증 로직은 추후 구현
-  const metadata = {
-    humanity_verified: true,
-    traits: '분석적, NFT 관심, "나만의 Web3 프로필"',
-    image: "https://placehold.co/200x200?text=AI+NFT+Image",
-  };
-  const userAddress = "0x1234...abcd";
-  const verifierLink = `https://soulframe.verifier.io/?user=${userAddress}`;
+  // localStorage에서 NFT 메타데이터 불러오기
+  let metadata = null;
+  try {
+    metadata = JSON.parse(window.localStorage.getItem("mysoulframe"));
+  } catch (e) {
+    metadata = null;
+  }
+  const userAddress = metadata?.wallet || "";
+  const verifierLink = userAddress ? `https://soulframe.verifier.io/?user=${userAddress}` : "#";
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#312e81] to-[#a21caf] p-4">
@@ -17,39 +18,53 @@ export default function MySoulFrame() {
         <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-glow">
           My SoulFrame
         </h2>
-        <div className="relative mb-6">
-          <img
-            src={metadata.image}
-            alt="NFT"
-            className="w-32 h-32 rounded-full border-4 border-fuchsia-300 shadow-xl animate-fade-in"
-          />
-          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-indigo-400 to-fuchsia-400 text-white rounded-full text-xs font-bold shadow animate-pulse">
-            SoulFrame NFT
-          </span>
-        </div>
-        <div className="bg-white/30 border border-indigo-200/30 rounded-xl p-4 text-center text-indigo-900 font-semibold text-lg shadow animate-fade-in-slow w-80 mb-4">
-          <div className="mb-1">
-            인증 완료: <span className="text-green-500 font-bold">O</span>
-          </div>
-          <div>특성: {metadata.traits}</div>
-        </div>
-        <div className="mb-2 text-indigo-300 text-xs">
-          내 주소:{" "}
-          <span className="font-mono text-fuchsia-300">{userAddress}</span>
-        </div>
-        <a
-          href={verifierLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mb-2 px-4 py-2 bg-gradient-to-r from-indigo-400 to-fuchsia-400 text-white rounded-full font-semibold shadow hover:from-fuchsia-400 hover:to-indigo-400 transition"
-        >
-          외부 검증 링크
-        </a>
-        <Link to="/ai-agent">
-          <button className="mt-6 w-full bg-gradient-to-r from-indigo-500 via-fuchsia-400 to-cyan-400 text-white py-3 rounded-full font-bold shadow-lg hover:from-fuchsia-400 hover:to-indigo-500 transition text-lg animate-pulse">
-            AI Agent와 대화하기
-          </button>
-        </Link>
+        {metadata ? (
+          <>
+            <div className="relative mb-6">
+              <img
+                src={metadata.image}
+                alt="NFT"
+                className="w-32 h-32 rounded-full border-4 border-fuchsia-300 shadow-xl animate-fade-in"
+              />
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-indigo-400 to-fuchsia-400 text-white rounded-full text-xs font-bold shadow animate-pulse">
+                SoulFrame NFT
+              </span>
+            </div>
+            <div className="bg-white/30 border border-indigo-200/30 rounded-xl p-4 text-center text-indigo-900 font-semibold text-lg shadow animate-fade-in-slow w-80 mb-4">
+              <div className="mb-1">
+                인증 완료: <span className="text-green-500 font-bold">O</span>
+              </div>
+              <div>Agent ID: <span className="font-mono text-xs text-fuchsia-500">{metadata.agentId}</span></div>
+              <div>특성: {metadata.traits}</div>
+              <div>AI 요약: {metadata.summary}</div>
+              <div>자기소개: {metadata.intro}</div>
+              <div>선호 대화 스타일: {metadata.chatStyle}</div>
+              <div className="mt-2 text-xs text-gray-500 text-left overflow-x-auto max-h-32">
+                <b>Agent 캐릭터 파일:</b>
+                <pre className="whitespace-pre-wrap break-all bg-gray-50 rounded p-2 mt-1 max-h-24 overflow-y-auto">{JSON.stringify(metadata.character, null, 2)}</pre>
+              </div>
+            </div>
+            <div className="mb-2 text-indigo-300 text-xs">
+              내 주소:{" "}
+              <span className="font-mono text-fuchsia-300">{userAddress}</span>
+            </div>
+            <a
+              href={verifierLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mb-2 px-4 py-2 bg-gradient-to-r from-indigo-400 to-fuchsia-400 text-white rounded-full font-semibold shadow hover:from-fuchsia-400 hover:to-indigo-400 transition"
+            >
+              외부 검증 링크
+            </a>
+            <Link to="/ai-agent">
+              <button className="mt-6 w-full bg-gradient-to-r from-indigo-500 via-fuchsia-400 to-cyan-400 text-white py-3 rounded-full font-bold shadow-lg hover:from-fuchsia-400 hover:to-indigo-500 transition text-lg animate-pulse">
+                AI Agent와 대화하기
+              </button>
+            </Link>
+          </>
+        ) : (
+          <div className="text-indigo-200 text-lg font-bold mb-8">아직 발행된 SoulFrame NFT가 없습니다.</div>
+        )}
       </div>
       <style>{`
         .drop-shadow-glow { text-shadow: 0 0 16px #a5b4fc, 0 0 32px #f0abfc; }
