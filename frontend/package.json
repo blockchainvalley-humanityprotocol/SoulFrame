@@ -9,8 +9,12 @@
   },
   "dependencies": {
     "@privy-io/react-auth": "^2.13.1",
+    "axios": "^1.9.0",
+    "framer-motion": "^12.10.5",
+    "locomotive-scroll": "^4.1.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.0"
   },
   "devDependencies": {

@@ -73,17 +73,17 @@ export default function MintSoulFrame() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#312e81] to-[#a21caf] p-4">
-      <div className="backdrop-blur-xl bg-white/10 border border-indigo-200/30 rounded-3xl shadow-2xl flex flex-col items-center px-10 py-12 max-w-md w-full animate-fade-in">
-        <h2 className="text-3xl font-extrabold mb-6 bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-glow">
-          SoulFrame NFT 발행
+    <div className="w-full min-h-screen bg-gradient-to-br from-[#f6fff2] via-[#e6f7e6] to-[#eaf6ff] flex flex-col items-center justify-center font-sans py-12 px-2">
+      <div className="bg-white/80 rounded-3xl shadow-xl flex flex-col items-center px-8 py-10 max-w-lg w-full animate-fade-in">
+        <h2 className="text-4xl font-extrabold mb-6 text-green-700 tracking-tight text-center">
+          SoulFrame NFT 민팅
         </h2>
         {!hasSBT ? (
-          <div className="bg-white/20 border border-red-300/30 rounded-xl px-6 py-4 text-red-400 font-bold mb-3 animate-shake">
+          <div className="bg-white/80 border border-red-200 rounded-xl px-6 py-4 text-red-500 font-bold mb-3 shadow animate-shake">
             Humanity 인증이 필요합니다.
           </div>
         ) : minted ? (
-          <div className="flex flex-col items-center space-y-5 w-80">
+          <div className="flex flex-col items-center space-y-5 w-full">
             <div className="relative">
               <img
                 src={
@@ -91,15 +91,15 @@ export default function MintSoulFrame() {
                   "https://placehold.co/200x200?text=AI+NFT+Image"
                 }
                 alt="NFT"
-                className="w-32 h-32 rounded-full border-4 border-fuchsia-300 shadow-xl animate-fade-in"
+                className="w-32 h-32 rounded-full border-4 border-green-300 shadow-xl animate-fade-in bg-white object-cover"
               />
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-indigo-400 to-fuchsia-400 text-white rounded-full text-xs font-bold shadow animate-pulse">
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-green-500 to-green-700 text-white rounded-full text-xs font-bold shadow animate-pulse">
                 SoulFrame NFT
               </span>
             </div>
-            <div className="bg-white/30 border border-indigo-200/30 rounded-xl p-4 text-center text-indigo-900 font-semibold text-lg shadow animate-fade-in-slow">
+            <div className="bg-white/80 border border-green-200 rounded-xl p-4 text-center text-green-900 font-semibold text-lg shadow animate-fade-in-slow">
               <div className="mb-1">
-                인증 완료: <span className="text-green-500 font-bold">O</span>
+                인증 완료: <span className="text-green-600 font-bold">O</span>
               </div>
               <div>특성: {traits}</div>
               <div>AI 요약: {metadata?.summary}</div>
@@ -172,7 +172,7 @@ export default function MintSoulFrame() {
               <div className="text-red-400 font-bold mb-3">{error}</div>
             )}
             <button
-              className="w-full bg-gradient-to-r from-indigo-500 via-fuchsia-400 to-cyan-400 text-white py-3 rounded-full font-bold shadow-lg hover:from-fuchsia-400 hover:to-indigo-500 transition text-lg animate-pulse mb-4 disabled:opacity-60"
+              className="w-full bg-green-700 hover:bg-green-800 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-md transition mb-4 disabled:opacity-60"
               onClick={handleMint}
               disabled={loading || !intro || !traits || !chatStyle}
             >

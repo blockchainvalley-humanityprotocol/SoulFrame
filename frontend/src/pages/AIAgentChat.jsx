@@ -51,10 +51,10 @@ export default function AIAgentChat() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#312e81] to-[#a21caf] p-4">
-      <div className="flex w-full max-w-5xl h-[600px] rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl bg-white/10 border border-indigo-200/30 animate-fade-in">
+    <div className="w-full min-h-screen bg-gradient-to-br from-[#f6fff2] via-[#e6f7e6] to-[#eaf6ff] flex items-center justify-center font-sans py-12 px-2">
+      <div className="flex w-full max-w-5xl h-[600px] rounded-3xl shadow-xl overflow-hidden bg-white/80 border border-green-200 animate-fade-in">
         {/* 좌측: NFT 비서 프로필 */}
-        <div className="w-1/3 bg-gray-900/80 flex flex-col items-center justify-center p-8 border-r border-indigo-200/20">
+        <div className="w-1/3 bg-white/0 flex flex-col items-center justify-center p-8 border-r border-green-100">
           <SoulFrameCard {...defaultProfile} />
         </div>
         {/* 우측: 기능 영역 */}
@@ -66,8 +66,8 @@ export default function AIAgentChat() {
                 key={t.key}
                 className={`px-5 py-2 rounded-full font-bold text-base border transition ${
                   tab === t.key
-                    ? "bg-fuchsia-500 text-white border-fuchsia-500"
-                    : "bg-white/20 text-fuchsia-300 border-fuchsia-200 hover:bg-fuchsia-100/20"
+                    ? "bg-green-700 text-white border-green-700"
+                    : "bg-white/60 text-green-700 border-green-200 hover:bg-green-100"
                 }`}
                 onClick={() => setTab(t.key)}
               >
@@ -91,8 +91,8 @@ export default function AIAgentChat() {
                       <div
                         className={`px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow ${
                           msg.from === "ai"
-                            ? "bg-fuchsia-100 text-fuchsia-900"
-                            : "bg-indigo-600 text-white"
+                            ? "bg-green-100 text-green-900"
+                            : "bg-green-700 text-white"
                         }`}
                       >
                         {msg.text}
@@ -105,7 +105,7 @@ export default function AIAgentChat() {
                   {promptButtons.map((p, i) => (
                     <button
                       key={i}
-                      className="bg-fuchsia-200 text-fuchsia-900 px-3 py-1 rounded-full text-xs font-semibold hover:bg-fuchsia-300 transition"
+                      className="bg-green-100 text-green-900 px-3 py-1 rounded-full text-xs font-semibold hover:bg-green-200 transition"
                       onClick={() => handleSend(p)}
                     >
                       {p}

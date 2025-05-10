@@ -19,7 +19,7 @@ function App() {
     <PrivyProvider appId="cmahyjqcc01uoi90np9ilatp2">
       <Router>
         <Header />
-        <div className="pt-8">
+        <div>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/humanity-auth" element={<HumanityAuth />} />

@@ -1,7 +1,8 @@
 // ElizaOS 연동 유틸 (AI 프로필 요약 및 이미지)
 // 실제 서비스에서는 ElizaOS API 엔드포인트 필요
 
-const ELIZAOS_API_BASE = process.env.REACT_APP_ELIZAOS_API_BASE || "http://localhost:3001";
+const ELIZAOS_API_BASE =
+  import.meta.env.VITE_ELIZAOS_API_BASE || "http://localhost:3001";
 
 /**
  * ElizaOS REST API로 agent(캐릭터)를 생성하고 요약/이미지/ID/설정 전체를 반환
@@ -16,8 +17,8 @@ export async function getAISummary({ trait, interest, intro }) {
     body: JSON.stringify({
       trait,
       interest,
-      intro
-    })
+      intro,
+    }),
   });
   if (!res.ok) throw new Error("ElizaOS agent 생성 실패");
   const agent = await res.json();
