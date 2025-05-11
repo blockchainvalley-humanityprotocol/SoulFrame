@@ -50,138 +50,140 @@ export default function Header() {
   }, [open]);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[1000] bg-black/80 backdrop-blur-md border-b border-white/10 shadow-xl flex items-center justify-between px-8 py-4">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <img src={Logo} alt="SoulFrame Logo" className="w-40 h-15" />
+    <header className="fixed top-2 left-0 w-full z-[1000] flex justify-center pointer-events-none">
+      <div className="backdrop-blur-xl bg-[#232428]/80 border border-white/10 shadow-2xl rounded-2xl px-6 py-2 flex items-center justify-between w-full max-w-5xl pointer-events-auto">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <img src={Logo} alt="SoulFrame Logo" className="w-32 h-12" />
+          </div>
+          <nav className="flex gap-6 ml-10 text-base font-medium">
+            <a href="/" className="text-white hover:text-[#934406] transition">
+              Home
+            </a>
+            <a
+              href="/mint"
+              className="text-white hover:text-[#934406] transition"
+            >
+              Mint
+            </a>
+            <a
+              href="/ai-agent"
+              className="text-white hover:text-[#934406] transition"
+            >
+              My AI-NFT
+            </a>
+            <a
+              href="https://docs.soulframe.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-[#934406] transition"
+            >
+              Docs
+            </a>
+          </nav>
         </div>
-        <nav className="flex gap-6 ml-10 text-base font-medium">
-          <a href="/" className="text-white hover:text-green-400 transition">
-            Home
-          </a>
-          <a
-            href="/mint"
-            className="text-white hover:text-green-400 transition"
-          >
-            Mint
-          </a>
-          <a
-            href="/ai-agent"
-            className="text-white hover:text-green-400 transition"
-          >
-            My AI-NFT
-          </a>
-          <a
-            href="https://docs.soulframe.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-green-400 transition"
-          >
-            Docs
-          </a>
-        </nav>
-      </div>
-      <div
-        className="relative"
-        ref={menuRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {authenticated ? (
-          <div
-            className="flex items-center gap-2 cursor-pointer select-none bg-purple-500/5 border border-purple-500/20 rounded-full px-3 py-1 shadow-md hover:bg-purple-500/10 transition text-purple-400"
-            onClick={() => setOpen((v) => !v)}
-          >
-            <img
-              src={AI1}
-              alt="avatar"
-              className="w-9 h-9 rounded-full border-2 border-purple-400 shadow"
-            />
-            <div className="flex flex-col items-start">
-              <div className="flex items-center gap-1">
-                <span className="font-semibold text-purple-400">
-                  @{nickname}
-                </span>
-                {isHumanityVerified && (
-                  <span className="ml-1 px-2 py-0.5 rounded-full bg-green-500/20 text-xs text-green-400 font-semibold border border-green-500/30">
-                    .human
+        <div
+          className="relative"
+          ref={menuRef}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {authenticated ? (
+            <div
+              className="flex items-center gap-2 cursor-pointer select-none bg-[#934406]/10 border border-[#934406]/30 rounded-full px-3 py-1 shadow-md hover:bg-[#934406]/20 transition text-[#934406]"
+              onClick={() => setOpen((v) => !v)}
+            >
+              <img
+                src={AI1}
+                alt="avatar"
+                className="w-9 h-9 rounded-full border-2 border-[#934406] shadow"
+              />
+              <div className="flex flex-col items-start">
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-[#934406]">
+                    @{nickname}
                   </span>
-                )}
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="font-mono text-purple-300 text-xs">
-                  {shortWallet}
-                </span>
-                {isHumanityVerified && (
-                  <span className="w-4 h-4 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-white text-[10px] font-semibold ml-1">
-                    ✔
+                  {isHumanityVerified && (
+                    <span className="ml-1 px-2 py-0.5 rounded-full bg-[#934406] text-xs text-white font-semibold border border-[#934406]/60">
+                      .human
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono text-white text-xs">
+                    {shortWallet}
                   </span>
-                )}
+                  {isHumanityVerified && (
+                    <span className="w-4 h-4 rounded-full bg-[#934406] border-2 border-white flex items-center justify-center text-white text-[10px] font-semibold ml-1">
+                      ✔
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-            {open && (
-              <div
-                className="absolute right-0 top-12 w-56 bg-[#1A1B1E]/95 text-purple-400 rounded-2xl shadow-xl border border-purple-400/20 p-4 z-50 animate-fade-in backdrop-blur"
-                style={{ minWidth: 220 }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <img
-                    src={AI1}
-                    alt="avatar"
-                    className="w-10 h-10 rounded-full border-2 border-purple-400"
-                  />
-                  <div>
-                    <div className="font-semibold text-base text-purple-400">
-                      @{nickname}
-                      {isHumanityVerified && (
-                        <span className="ml-1 px-2 py-0.5 rounded-full bg-green-500/20 text-xs text-green-400 font-semibold border border-green-500/30">
-                          .human
-                        </span>
-                      )}
-                    </div>
-                    <div className="font-mono text-purple-300 text-xs">
-                      {shortWallet}
+              {open && (
+                <div
+                  className="absolute right-0 top-12 w-56 bg-[#1A1B1E]/95 text-[#934406] rounded-2xl shadow-xl border border-[#934406]/30 p-4 z-50 animate-fade-in backdrop-blur"
+                  style={{ minWidth: 220 }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <img
+                      src={AI1}
+                      alt="avatar"
+                      className="w-10 h-10 rounded-full border-2 border-[#934406]"
+                    />
+                    <div>
+                      <div className="font-semibold text-base text-[#934406]">
+                        @{nickname}
+                        {isHumanityVerified && (
+                          <span className="ml-1 px-2 py-0.5 rounded-full bg-[#934406] text-xs text-white font-semibold border border-[#934406]/60">
+                            .human
+                          </span>
+                        )}
+                      </div>
+                      <div className="font-mono text-white text-xs">
+                        {shortWallet}
+                      </div>
                     </div>
                   </div>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="/profile"
+                      className="flex items-center gap-2 hover:bg-[#934406]/10 rounded-lg px-3 py-2 transition"
+                    >
+                      <span className="text-lg">👤</span> My Profile
+                    </a>
+                    <a
+                      href="/setting"
+                      className="flex items-center gap-2 hover:bg-[#934406]/10 rounded-lg px-3 py-2 transition"
+                    >
+                      <span className="text-lg">✏️</span> Setting
+                    </a>
+                    <button
+                      className="flex items-center gap-2 hover:bg-[#934406]/10 rounded-lg px-3 py-2 transition text-left"
+                      onClick={async () => {
+                        await logout();
+                        window.localStorage.removeItem("wallet");
+                        window.location.reload();
+                      }}
+                    >
+                      <span className="text-lg">⏏️</span> Disconnect
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <a
-                    href="/profile"
-                    className="flex items-center gap-2 hover:bg-purple-400/10 rounded-lg px-3 py-2 transition"
-                  >
-                    <span className="text-lg">👤</span> My Profile
-                  </a>
-                  <a
-                    href="/setting"
-                    className="flex items-center gap-2 hover:bg-purple-400/10 rounded-lg px-3 py-2 transition"
-                  >
-                    <span className="text-lg">✏️</span> Setting
-                  </a>
-                  <button
-                    className="flex items-center gap-2 hover:bg-purple-400/10 rounded-lg px-3 py-2 transition text-left"
-                    onClick={async () => {
-                      await logout();
-                      window.localStorage.removeItem("wallet");
-                      window.location.reload();
-                    }}
-                  >
-                    <span className="text-lg">⏏️</span> Disconnect
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <button
-            className="bg-purple-500/5 hover:bg-purple-500/10 text-purple-400 px-6 py-2 rounded-full font-semibold shadow-md border border-purple-500/20 transition"
-            onClick={login}
-          >
-            Connect Wallet
-          </button>
-        )}
+              )}
+            </div>
+          ) : (
+            <button
+              className="bg-[#934406] hover:bg-[#b85a0a] text-white px-6 py-2 rounded-full font-semibold shadow-md border border-[#934406]/30 transition"
+              onClick={login}
+            >
+              Connect Wallet
+            </button>
+          )}
+        </div>
       </div>
       <style>{`
-        .drop-shadow-glow { text-shadow: 0 0 16px rgba(74, 222, 128, 0.4), 0 0 32px rgba(74, 222, 128, 0.2); }
+        .drop-shadow-glow { text-shadow: 0 0 16px #93440666, 0 0 32px #93440633; }
         .animate-fade-in { animation: fadeIn 1.2s cubic-bezier(.4,0,.2,1) both; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: none; } }
       `}</style>

@@ -12,7 +12,7 @@ export default function HumanityAuth() {
     try {
       const wallet = window.localStorage.getItem("wallet");
       if (!wallet) throw new Error("지갑 정보 없음. 먼저 로그인하세요.");
-      navigate("/create-profile");
+      navigate("/mint");
     } catch (e) {
       setError(e.message || "인증 실패");
     }

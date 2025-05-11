@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import HumanityAuth from "./pages/HumanityAuth";
-import CreateProfile from "./pages/CreateProfile";
 import MintSoulFrame from "./pages/MintSoulFrame";
 import MySoulFrame from "./pages/MySoulFrame";
 import AIAgentChat from "./pages/AIAgentChat";
@@ -23,7 +22,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/humanity-auth" element={<HumanityAuth />} />
-            <Route path="/create-profile" element={<CreateProfile />} />
             <Route path="/mint" element={<MintSoulFrame />} />
             <Route path="/mysoulframe" element={<MySoulFrame />} />
             <Route path="/ai-agent" element={<AIAgentChat />} />

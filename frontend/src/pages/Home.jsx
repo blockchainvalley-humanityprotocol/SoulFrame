@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import green from "../assets/trust-status/green.png";
+import yellow from "../assets/trust-status/yellow.png";
+import red from "../assets/trust-status/red.png";
+import hand from "../assets/hand.png";
+import aiRobot1 from "../assets/ai-robot1.jpeg";
 import Header from "../components/Header";
 import {
   FiKey,
@@ -69,34 +74,34 @@ const trustStatusCards = [
   {
     key: "active",
     title: "Active",
-    img: "/assets/trust-status/green.png",
+    img: green,
     features: [
-      "모든 기능 사용 가능",
-      "DAO 투표 참여",
-      "에어드랍 자격",
-      "커뮤니티 인증",
+      "All features enabled",
+      "DAO voting eligible",
+      "Airdrop eligible",
+      "Verified in communities",
     ],
   },
   {
     key: "idle",
     title: "Idle",
-    img: "/assets/trust-status/yellow.png",
+    img: yellow,
     features: [
-      "기본 기능 사용",
-      "제한된 DAO 참여",
-      "에어드랍 제한",
-      "30일 이내 재인증 필요",
+      "Limited features",
+      "Restricted DAO voting",
+      "Airdrop not eligible",
+      "Re-verification required (within 30 days)",
     ],
   },
   {
     key: "dormant",
     title: "Dormant",
-    img: "/assets/trust-status/red.png",
+    img: red,
     features: [
-      "기본 프로필만 표시",
-      "DAO 참여 불가",
-      "에어드랍 제외",
-      "재인증 필요",
+      "Profile only visible",
+      "No DAO voting rights",
+      "Airdrop excluded",
+      "Re-verification required",
     ],
   },
 ];
@@ -135,6 +140,68 @@ const sections = [
   "roadmap",
   "faq",
 ];
+
+function RotatingMessageBox() {
+  const messages = [
+    <span
+      className="text-lg md:text-xl font-semibold text-white text-center block leading-relaxed"
+      key="liveness"
+    >
+      Liveness is verified through the real-time pulse flow
+      <br className="hidden md:inline" /> within your veins.
+    </span>,
+    <span
+      className="text-lg md:text-xl font-semibold text-white text-center block leading-relaxed"
+      key="privacy"
+    >
+      Your data remains private.
+      <br />
+      With future{" "}
+      <span className="font-bold" style={{ color: "#934406" }}>
+        Zero-Knowledge Proof
+      </span>{" "}
+      integration,
+      <br />
+      no one — not even us — can see your raw biometric data.
+    </span>,
+  ];
+  const [idx, setIdx] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAnimating(true);
+      setTimeout(() => {
+        setIdx((prev) => (prev + 1) % messages.length);
+        setAnimating(false);
+      }, 400);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <div className="relative bg-[#181A20]/80 border border-[#934406]/40 rounded-xl shadow-lg px-6 py-8 flex items-center justify-center min-h-[120px] w-full max-w-2xl overflow-hidden transition-all duration-700">
+      <div
+        className={`w-full flex items-center justify-center absolute left-0 top-0 h-full transition-transform duration-400 ${
+          animating
+            ? "-translate-x-full opacity-0"
+            : "translate-x-0 opacity-100"
+        }`}
+        key={idx + "-out"}
+        style={{ zIndex: animating ? 1 : 2 }}
+      >
+        {messages[idx % messages.length]}
+      </div>
+      <div
+        className={`w-full flex items-center justify-center absolute left-0 top-0 h-full transition-transform duration-400 ${
+          animating ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+        }`}
+        key={idx + "-in"}
+        style={{ zIndex: animating ? 2 : 1 }}
+      >
+        {messages[(idx + 1) % messages.length]}
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [currentSection, setCurrentSection] = useState(0);
@@ -193,7 +260,7 @@ export default function Home() {
               key={index}
               className={`w-3 h-3 rounded-full ${
                 currentSection === index
-                  ? "bg-blue-500 scale-125"
+                  ? "bg-[#934406] scale-125"
                   : "bg-gray-400 opacity-50"
               } transition-all duration-300`}
               onClick={() => goToSection(index)}
@@ -215,82 +282,214 @@ export default function Home() {
             className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-10"
           >
             <div className="flex-1 text-left md:pr-8 order-2 md:order-1">
-              <h1 className="text-4xl md:text-6xl font-semibold text-white mb-6 leading-tight">
+              <h1
+                className="text-3xl md:text-5xl font-semibold text-white mb-2 leading-tight tracking-tight max-w-4xl"
+                style={{ wordBreak: "keep-all" }}
+              >
                 Prove you're alive.
                 <br />
                 Own your identity.
-                <br />
-                <span className="text-3xl md:text-4xl block mt-3 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">
-                  Live as an AI-powered persona
-                </span>
               </h1>
-              <p className="text-lg md:text-xl text-blue-200 mb-8 font-medium">
-                SoulFrame is the first liveness-based identity system on-chain.
+              <h2
+                className="text-2xl md:text-3xl font-semibold mb-4"
+                style={{ color: "#934406" }}
+              >
+                Live as an AI-powered persona
+              </h2>
+              <p className="text-base md:text-lg text-white/80 mb-8">
+                SoulFrame is your on-chain AI identity — verified by your veins,
+                shaped by your values.
               </p>
-              <Link to="/create-profile">
-                <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl px-8 py-3 text-lg shadow-lg transition">
+              <Link to="/mint">
+                <button className="bg-[#934406] hover:bg-[#b85a0a] text-white font-semibold rounded-xl px-8 py-3 text-lg shadow-lg transition glow-on-hover">
                   Start your SoulFrame
                 </button>
               </Link>
             </div>
             <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2 mb-8 md:mb-0">
-              <div className="relative w-[380px] h-[380px] md:w-[520px] md:h-[520px] md:mr-24 mr-4 flex items-center justify-center">
+              <div className="relative w-[380px] h-[380px] md:w-[520px] md:h-[520px] md:mr-24 mr-4 flex items-center justify-center bg-transparent shadow-none rounded-none">
                 <img
-                  src="/assets/handzz.jpg"
+                  src={hand}
                   alt="Holographic Hand"
-                  className="w-full h-full object-contain rounded-lg drop-shadow-2xl"
+                  className="w-full h-full object-contain bg-transparent shadow-none rounded-none"
+                  style={{
+                    background: "transparent",
+                    boxShadow: "none",
+                    borderRadius: 0,
+                  }}
                 />
-                <div className="absolute -inset-1 bg-blue-500/20 rounded-xl blur-xl -z-10"></div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-blue-500/10 rounded-xl"></div>
               </div>
             </div>
           </motion.div>
+          <div className="absolute inset-0 w-full h-full pointer-events-none -z-10">
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 1440 900"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-full"
+            >
+              <g opacity="0.18">
+                <path
+                  d="M0 700 Q 360 600 720 700 T 1440 700"
+                  stroke="#00faff"
+                  strokeWidth="2"
+                  fill="none"
+                >
+                  <animate
+                    attributeName="d"
+                    values="M0 700 Q 360 600 720 700 T 1440 700;M0 710 Q 360 620 720 690 T 1440 710;M0 700 Q 360 600 720 700 T 1440 700"
+                    dur="6s"
+                    repeatCount="indefinite"
+                  />
+                </path>
+                <path
+                  d="M0 800 Q 480 850 960 800 T 1440 800"
+                  stroke="#00faff"
+                  strokeWidth="1.5"
+                  fill="none"
+                >
+                  <animate
+                    attributeName="d"
+                    values="M0 800 Q 480 850 960 800 T 1440 800;M0 790 Q 480 830 960 810 T 1440 790;M0 800 Q 480 850 960 800 T 1440 800"
+                    dur="7s"
+                    repeatCount="indefinite"
+                  />
+                </path>
+                <path
+                  d="M0 600 Q 720 500 1440 600"
+                  stroke="#00faff"
+                  strokeWidth="1"
+                  fill="none"
+                >
+                  <animate
+                    attributeName="d"
+                    values="M0 600 Q 720 500 1440 600;M0 610 Q 720 520 1440 590;M0 600 Q 720 500 1440 600"
+                    dur="8s"
+                    repeatCount="indefinite"
+                  />
+                </path>
+                <circle cx="300" cy="650" r="16" fill="#00faff" opacity="0.5">
+                  <animate
+                    attributeName="opacity"
+                    values="0.5;1;0.5"
+                    dur="4s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+                <circle cx="900" cy="750" r="10" fill="#00faff" opacity="0.4">
+                  <animate
+                    attributeName="opacity"
+                    values="0.4;0.9;0.4"
+                    dur="5s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+                <circle cx="1200" cy="620" r="14" fill="#00faff" opacity="0.3">
+                  <animate
+                    attributeName="opacity"
+                    values="0.3;0.8;0.3"
+                    dur="6s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+                <circle cx="600" cy="800" r="12" fill="#00faff" opacity="0.5">
+                  <animate
+                    attributeName="opacity"
+                    values="0.5;1;0.5"
+                    dur="3.5s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+                <circle cx="1100" cy="680" r="8" fill="#00faff" opacity="0.4">
+                  <animate
+                    attributeName="opacity"
+                    values="0.4;0.7;0.4"
+                    dur="4.5s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+                <circle cx="400" cy="720" r="10" fill="#00faff" opacity="0.3">
+                  <animate
+                    attributeName="opacity"
+                    values="0.3;0.6;0.3"
+                    dur="5.5s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+              </g>
+            </svg>
+          </div>
         </section>
 
         {/* Section 2: How SoulFrame Works → 타임라인으로 대체 */}
         <section
           id="how-it-works"
           ref={sectionRefs.current[1]}
-          className="relative w-full h-screen flex items-center justify-center bg-[#121417] text-white overflow-hidden snap-start"
+          className="relative w-full min-h-screen flex items-center justify-center bg-[#121417] text-white overflow-hidden snap-start pt-20 md:pt-24 pb-6"
         >
           <motion.div
             initial="hidden"
             animate={currentSection === 1 ? "visible" : "hidden"}
             variants={sectionVariants}
-            className="max-w-7xl mx-auto px-6"
+            className="max-w-5xl mx-auto px-4 py-4 md:py-6"
           >
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">
-              How Users Experience SoulFrame
+            <h2
+              className="text-2xl md:text-3xl font-bold text-center mb-6"
+              style={{ color: "#934406" }}
+            >
+              Get Soul-Framed in 4 Steps
             </h2>
             <div className="relative">
               {/* Timeline */}
               <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-500/30"></div>
               {/* Timeline Steps */}
-              <div className="space-y-24">
+              <div className="space-y-8 md:space-y-12 lg:space-y-16 py-2 md:py-4">
                 {[
                   {
-                    title: "지갑 연결",
-                    desc: "MetaMask 또는 다른 Web3 지갑으로 로그인",
-                    icon: <FiKey className="text-2xl" />,
-                    color: "text-blue-400",
+                    title: "Wallet Connect",
+                    desc: "Login via Web3 wallet",
+                    icon: (
+                      <FiKey
+                        className="text-xl md:text-2xl"
+                        style={{ color: "#934406" }}
+                      />
+                    ),
+                    color: "text-[#934406]",
                   },
                   {
-                    title: "생체 인증",
-                    desc: "Humanity Protocol 기반 생체 인증 절차 완료",
-                    icon: <FiActivity className="text-2xl" />,
-                    color: "text-blue-400",
+                    title: "Humanity Verification",
+                    desc: "Complete identity verification with Humanity Protocol",
+                    icon: (
+                      <FiActivity
+                        className="text-xl md:text-2xl"
+                        style={{ color: "#934406" }}
+                      />
+                    ),
+                    color: "text-[#934406]",
                   },
                   {
-                    title: "AI 페르소나",
-                    desc: "ElizaOS 기반 AI가 나만의 디지털 정체성 생성",
-                    icon: <FiCpu className="text-2xl" />,
-                    color: "text-blue-400",
+                    title: "AI Persona",
+                    desc: "Generate your AI-powered identity via ElizaOS",
+                    icon: (
+                      <FiCpu
+                        className="text-xl md:text-2xl"
+                        style={{ color: "#934406" }}
+                      />
+                    ),
+                    color: "text-[#934406]",
                   },
                   {
-                    title: "NFT 발행",
-                    desc: "나만의 SoulFrame NFT 발행 및 기능 활성화",
-                    icon: <FiCheckCircle className="text-2xl" />,
-                    color: "text-blue-400",
+                    title: "NFT Minting",
+                    desc: "Mint your SoulFrame NFT and unlock its features",
+                    icon: (
+                      <FiCheckCircle
+                        className="text-xl md:text-2xl"
+                        style={{ color: "#934406" }}
+                      />
+                    ),
+                    color: "text-[#934406]",
                   },
                 ].map((step, i) => (
                   <motion.div
@@ -300,19 +499,31 @@ export default function Home() {
                     transition={{ delay: i * 0.2 }}
                     className={`flex items-center ${
                       i % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                    }`}
+                    } gap-4 md:gap-6`}
                   >
                     <div
-                      className={`w-1/2 ${
-                        i % 2 === 0 ? "text-right pr-8" : "text-left pl-8"
+                      className={`w-1/2 flex flex-col justify-center ${
+                        i % 2 === 0
+                          ? "items-end text-right pr-3 md:pr-6"
+                          : "items-start text-left pl-3 md:pl-6"
                       }`}
                     >
-                      <h3 className={`text-xl font-bold mb-2 ${step.color}`}>
+                      <h3
+                        className={`text-base md:text-lg font-bold mb-1 ${step.color}`}
+                      >
                         {step.title}
                       </h3>
-                      <p className="text-white/80">{step.desc}</p>
+                      <p
+                        className="text-sm md:text-base text-white/80 max-w-md leading-relaxed mt-1"
+                        style={{ wordBreak: "keep-all", textWrap: "balance" }}
+                      >
+                        {step.desc}
+                      </p>
                     </div>
-                    <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full bg-[#1E2124] border-2 border-blue-500">
+                    <div
+                      className="relative z-10 flex items-center justify-center w-8 h-8 md:w-12 md:h-12 rounded-full bg-[#1E2124] border-2 border-blue-500 mx-2"
+                      style={{ minWidth: "2rem", minHeight: "2rem" }}
+                    >
                       {step.icon}
                     </div>
                     <div className="w-1/2"></div>
@@ -350,53 +561,14 @@ export default function Home() {
               <div className="absolute bottom-1/4 right-1/4 w-2 h-2 bg-purple-400 rounded-full animate-ping delay-2000 opacity-70"></div>
             </div>
 
-            <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white text-center">
+            <div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6">
+              <h2
+                className="text-3xl md:text-4xl font-bold mb-6 text-center"
+                style={{ color: "#934406" }}
+              >
                 How We Verify You're Alive
               </h2>
-              <p className="text-xl md:text-2xl text-white/90 mb-8 text-center leading-relaxed">
-                정맥 속 흐름으로 살아있음을 증명합니다.
-                <br />
-                <span className="text-blue-400 font-medium">
-                  Humanity Protocol
-                </span>
-                의 최신 기술로 당신의 신원을 안전하게 보호합니다.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl mx-auto mt-6">
-                <div className="bg-[#1A1B1E]/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-green-500/20 hover:border-green-500/40 transition-all duration-300 flex flex-col items-center group hover:transform hover:scale-105">
-                  <span className="text-4xl mb-3 transform transition-transform group-hover:scale-110">
-                    ✅
-                  </span>
-                  <h3 className="text-xl font-bold text-green-400 mb-2">
-                    생체 인증 기반
-                  </h3>
-                  <p className="text-center text-white/70">
-                    고유한 생체 정보를 활용한 안전한 인증 기술
-                  </p>
-                </div>
-                <div className="bg-[#1A1B1E]/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 flex flex-col items-center group hover:transform hover:scale-105">
-                  <span className="text-4xl mb-3 transform transition-transform group-hover:scale-110">
-                    🔒
-                  </span>
-                  <h3 className="text-xl font-bold text-blue-400 mb-2">
-                    개인정보 저장 안함
-                  </h3>
-                  <p className="text-center text-white/70">
-                    개인 정보는 절대 온체인에 저장되지 않습니다
-                  </p>
-                </div>
-                <div className="bg-[#1A1B1E]/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 flex flex-col items-center group hover:transform hover:scale-105">
-                  <span className="text-4xl mb-3 transform transition-transform group-hover:scale-110">
-                    📡
-                  </span>
-                  <h3 className="text-xl font-bold text-purple-400 mb-2">
-                    실시간 정맥 분석
-                  </h3>
-                  <p className="text-center text-white/70">
-                    최첨단 알고리즘으로 실시간 생체 데이터 처리
-                  </p>
-                </div>
-              </div>
+              <RotatingMessageBox />
             </div>
           </motion.div>
         </section>
@@ -413,7 +585,10 @@ export default function Home() {
             variants={sectionVariants}
             className="max-w-7xl mx-auto px-6"
           >
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            <h2
+              className="text-3xl font-bold text-center mb-12"
+              style={{ color: "#934406" }}
+            >
               Your Identity Has a Status
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -436,7 +611,9 @@ export default function Home() {
                         className="flex items-center gap-2 text-white/80"
                         key={j}
                       >
-                        <span className="text-lg">✓</span>
+                        <span className="text-lg" style={{ color: "#934406" }}>
+                          ✓
+                        </span>
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -459,38 +636,91 @@ export default function Home() {
             variants={sectionVariants}
             className="max-w-6xl mx-auto px-6"
           >
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            <h2
+              className="text-3xl font-bold text-center mb-12"
+              style={{ color: "#934406" }}
+            >
               Create Your AI Persona
             </h2>
-            <div className="flex flex-col md:flex-row gap-12 items-center">
-              <div className="flex-1 flex flex-col">
-                <p className="text-white mb-4">
-                  성향, 관심사, 한 줄 자기소개 기반 프로필 생성
-                </p>
-                <textarea
-                  className="w-full p-4 rounded-lg bg-[#1A1B1E] border border-white/10 text-white mb-4 min-h-[120px]"
-                  placeholder="Web3 enthusiast, 탈중앙화와 개인정보 보호에 관심, DAOs와 DeFi에 특히 집중하는 개발자..."
-                />
-                <button className="bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl px-6 py-3 self-start">
-                  AI 프로필 생성
-                </button>
-                <p className="text-xs text-white/60 mt-2">
-                  향후 AI Agent와 연결 예정
-                </p>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-12 w-full">
+              {/* 왼쪽: 대화 말풍선 영역 */}
+              <div className="flex-1 flex flex-col gap-6">
+                {/* 유저 질문 (왼쪽 말풍선) */}
+                <div className="flex w-full">
+                  <div className="flex flex-col w-full max-w-[420px] min-w-[320px]">
+                    <div className="relative bg-[#23272F]/90 border border-[#934406]/30 rounded-2xl px-5 py-4 shadow-lg w-full max-w-[420px] min-w-[320px] text-white text-[15px] leading-relaxed">
+                      <span className="block font-semibold mb-1 text-[#934406]">
+                        You
+                      </span>
+                      {/* 태그 영역 (You 바로 아래) */}
+                      <div className="flex gap-2 mb-2">
+                        <span className="px-3 py-0.5 rounded-full border border-[#934406] text-[#934406] text-xs font-semibold bg-[#23272F]/60">
+                          Meme Coin Trading
+                        </span>
+                        <span className="px-3 py-0.5 rounded-full border border-[#934406] text-[#934406] text-xs font-semibold bg-[#23272F]/60">
+                          Stable Yield
+                        </span>
+                      </div>
+                      "Where can I get the highest stable yield right now?"
+                      <br />
+                      "Is automatic BTC trading possible?"
+                    </div>
+                  </div>
+                </div>
+                {/* AI 답변 (오른쪽 말풍선) */}
+                <div className="flex w-full justify-end">
+                  <div className="relative bg-[#1A1B1E]/90 border border-[#934406]/30 rounded-2xl px-5 py-4 shadow-lg w-full max-w-[420px] min-w-[320px] text-white text-[15px] leading-relaxed text-right">
+                    <span className="block font-semibold mb-1 text-[#934406]">
+                      AI Persona
+                    </span>
+                    <div className="mb-1 text-[#22c55e] font-semibold text-sm">
+                      [🟢 Status: Active]
+                    </div>
+                    Auto trading enabled, all features activated.
+                  </div>
+                </div>
+                {/* AI 답변 (오른쪽 말풍선) - 추가 */}
+                <div className="flex w-full justify-end">
+                  <div className="relative bg-[#1A1B1E]/90 border border-[#934406]/30 rounded-2xl px-5 py-4 shadow-lg w-full max-w-[420px] min-w-[320px] text-white text-[15px] leading-relaxed text-right">
+                    <span className="block font-semibold mb-1 text-[#934406]">
+                      AI Persona
+                    </span>
+                    You can currently sell BTC under the given conditions.
+                    <br />
+                    The set price target has already been reached.
+                    <br />
+                    <br />
+                    <span className="font-bold text-white">
+                      📌 Stable Yield Recommendations:
+                    </span>
+                    <br />
+                    <span className="text-white">
+                      • Bybit BTC-USDC Pool – APR 33%
+                      <br />• Curve stUSDT – APR 29%
+                    </span>
+                    <br />
+                    <br />
+                    <span className="font-semibold text-white">
+                      Would you like to deposit now?
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex-1 flex flex-col items-center">
-                <div className="w-56 h-56 rounded-full overflow-hidden flex items-center justify-center mb-6 shadow-lg border-2 border-white/20">
-                  <img
-                    src="/assets/ai-robot.png"
-                    alt="AI Persona"
-                    className="w-full h-full object-cover"
-                  />
+              {/* 오른쪽: 이미지 */}
+              <div className="flex-1 flex items-center justify-center relative">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#934406]/30 via-[#23272F]/60 to-[#934406]/10 blur-2xl"></div>
                 </div>
-                <div className="bg-[#1A1B1E] rounded-xl p-6 text-white">
-                  "Web3 builder with passion for decentralized identity
-                  solutions. Actively contributes to DAO governance and values
-                  privacy-first technology."
-                </div>
+                <img
+                  src={aiRobot1}
+                  alt="AI Persona"
+                  className="relative z-10 w-[360px] h-[360px] object-cover rounded-full shadow-2xl border-4 border-[#23272F]/60"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center 40%",
+                    transform: "translateY(10%)",
+                  }}
+                />
               </div>
             </div>
           </motion.div>
@@ -508,45 +738,75 @@ export default function Home() {
             variants={sectionVariants}
             className="max-w-7xl mx-auto px-6"
           >
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            <h2
+              className="text-3xl font-bold text-center mb-12"
+              style={{ color: "#934406" }}
+            >
               SoulFrame Use Cases
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
-                  title: "DAO 거버넌스",
-                  desc: "진짜 인간만 DAO 투표 참여. Sybil 공격 방지.",
-                  icon: <FiUsers className="text-3xl" />,
+                  title: "DAO Governance",
+                  desc: "Only real humans can participate in DAO voting. Prevent Sybil attacks.",
+                  icon: (
+                    <FiUsers
+                      className="text-3xl"
+                      style={{ color: "#934406" }}
+                    />
+                  ),
                   color: "bg-[#1A1B1E] text-blue-400",
                 },
                 {
-                  title: "Web3 커뮤니티",
-                  desc: "Discord, Telegram 등 Web3 커뮤니티 인증.",
-                  icon: <FiUsers className="text-3xl" />,
+                  title: "Web3 Community",
+                  desc: "Authenticate in Web3 communities like Discord and Telegram.",
+                  icon: (
+                    <FiUsers
+                      className="text-3xl"
+                      style={{ color: "#934406" }}
+                    />
+                  ),
                   color: "bg-[#1A1B1E] text-purple-400",
                 },
                 {
-                  title: "토큰 에어드랍",
-                  desc: "휴먼 프로필 소유자에게만 진짜 에어드랍.",
-                  icon: <FiActivity className="text-3xl" />,
+                  title: "Token Airdrop",
+                  desc: "Genuine airdrops only for verified human profile holders.",
+                  icon: (
+                    <FiActivity
+                      className="text-3xl"
+                      style={{ color: "#934406" }}
+                    />
+                  ),
                   color: "bg-[#1A1B1E] text-green-400",
                 },
                 {
-                  title: "신원 DeFi",
-                  desc: "Web3 평판과 신원 기반 DeFi 솔루션.",
-                  icon: <FiLock className="text-3xl" />,
+                  title: "Identity DeFi",
+                  desc: "DeFi solutions based on Web3 reputation and identity.",
+                  icon: (
+                    <FiLock className="text-3xl" style={{ color: "#934406" }} />
+                  ),
                   color: "bg-[#1A1B1E] text-yellow-400",
                 },
                 {
-                  title: "디지털 여권",
-                  desc: "메타버스와 Web3 내 디지털 신원증명.",
-                  icon: <FiShield className="text-3xl" />,
+                  title: "Digital Passport",
+                  desc: "Digital identity verification in the Metaverse and Web3.",
+                  icon: (
+                    <FiShield
+                      className="text-3xl"
+                      style={{ color: "#934406" }}
+                    />
+                  ),
                   color: "bg-[#1A1B1E] text-red-400",
                 },
                 {
-                  title: "분산형 소셜",
-                  desc: "소셜 미디어에서 실제 인간 인증.",
-                  icon: <FiUsers className="text-3xl" />,
+                  title: "Decentralized Social",
+                  desc: "Prove your humanity in social media platforms.",
+                  icon: (
+                    <FiUsers
+                      className="text-3xl"
+                      style={{ color: "#934406" }}
+                    />
+                  ),
                   color: "bg-[#1A1B1E] text-indigo-400",
                 },
               ].map((card, i) => (
@@ -584,42 +844,65 @@ export default function Home() {
             variants={sectionVariants}
             className="max-w-6xl mx-auto px-6"
           >
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            <h2
+              className="text-3xl font-bold text-center mb-12"
+              style={{ color: "#934406" }}
+            >
               SoulFrame Roadmap
             </h2>
             <div className="relative pb-12">
               {/* Horizontal line */}
-              <div className="absolute h-1 w-full bg-blue-900 top-16"></div>
+              <div className="absolute h-1 w-full bg-[#23272F] top-16"></div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {[
                   {
                     phase: "Phase 1",
-                    title: "MVP Launch",
-                    items: ["기본 생체인증", "웹 앱 베타", "MVP 출시"],
-                    status: "completed",
-                    date: "2023 Q4",
+                    title: "Persona & SBT",
+                    items: [
+                      "AI Persona Prototype",
+                      "SBT NFT Design",
+                      "Profile-to-Image Test",
+                      "Minting UI/UX",
+                    ],
+                    status: "current",
+                    date: "2025 Q2 (Now)",
                   },
                   {
                     phase: "Phase 2",
-                    title: "AI Integration",
-                    items: ["ElizaOS 연동", "AI 페르소나", "DAO 통합"],
-                    status: "current",
-                    date: "2024 Q2",
+                    title: "On-chain Integration",
+                    items: [
+                      "DAO Verification",
+                      "Automated Trading",
+                      "Status-based Access",
+                      "DID Integration",
+                    ],
+                    status: "upcoming",
+                    date: "2025 Q3",
                   },
                   {
                     phase: "Phase 3",
-                    title: "ID Framework",
-                    items: ["파트너십 확장", "SDK 개발", "신원 DeFi"],
+                    title: "ZK & Privacy",
+                    items: [
+                      "ZK Authentication",
+                      "Privacy Protection",
+                      "SDK/API Release",
+                      "Global DID Prep",
+                    ],
                     status: "upcoming",
-                    date: "2024 Q4",
+                    date: "2025 Q4",
                   },
                   {
                     phase: "Phase 4",
                     title: "Global Expansion",
-                    items: ["글로벌 확장", "엔터프라이즈", "웹3 표준화"],
+                    items: [
+                      "Global Launch",
+                      "Enterprise Support",
+                      "Web3 Standardization",
+                      "Ecosystem Growth",
+                    ],
                     status: "upcoming",
-                    date: "2025 Q2",
+                    date: "2026 Q1",
                   },
                 ].map((phase, i) => (
                   <motion.div
@@ -635,13 +918,13 @@ export default function Home() {
                         phase.status === "completed"
                           ? "border-green-500 bg-green-500"
                           : phase.status === "current"
-                          ? "border-blue-500 bg-blue-500"
-                          : "border-blue-900 bg-[#121417]"
+                          ? "border-green-500 bg-green-500"
+                          : "border-[#23272F] bg-[#23272F]"
                       } top-12 z-10`}
                     ></div>
 
                     <div className="text-center mb-8">
-                      <span className="text-blue-400 font-bold">
+                      <span className="font-bold" style={{ color: "#934406" }}>
                         {phase.phase}
                       </span>
                     </div>
@@ -649,8 +932,8 @@ export default function Home() {
                     <div
                       className={`rounded-xl p-5 mt-10 ${
                         phase.status === "current"
-                          ? "bg-blue-900/50 border-blue-500 border"
-                          : "bg-[#1A1B1E]"
+                          ? "bg-[#1A1B1E] border border-green-500"
+                          : "bg-[#1A1B1E] border border-[#23272F]"
                       }`}
                     >
                       <h3 className="font-bold text-xl mb-2">{phase.title}</h3>
@@ -694,7 +977,10 @@ export default function Home() {
             variants={sectionVariants}
             className="max-w-7xl mx-auto px-6"
           >
-            <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            <h2
+              className="text-3xl font-bold text-center mb-12"
+              style={{ color: "#934406" }}
+            >
               FAQ & Community
             </h2>
 
@@ -702,25 +988,25 @@ export default function Home() {
               {/* FAQ Section */}
               <div>
                 <h3 className="text-2xl font-bold mb-6 text-white">
-                  자주 묻는 질문
+                  Frequently Asked Questions
                 </h3>
                 <div className="space-y-6">
                   {[
                     {
-                      q: "왜 생체인증이 필요한가요?",
-                      a: "Sybil 공격을 방지하고 진짜 인간만 참여할 수 있는 Web3 환경을 만들기 위해서입니다.",
+                      q: "Why is biometric verification necessary?",
+                      a: "To prevent Sybil attacks and ensure only real humans can participate in the Web3 environment.",
                     },
                     {
-                      q: "내 개인정보는 어떻게 보호되나요?",
-                      a: "생체 데이터는 온체인에 저장되지 않으며, 인증 과정에서만 사용됩니다. Zero-Knowledge 증명 방식으로 개인정보를 보호합니다.",
+                      q: "How is my personal data protected?",
+                      a: "Biometric data is never stored on-chain and is only used during verification. Zero-Knowledge proofs protect your privacy.",
                     },
                     {
-                      q: "SoulFrame NFT는 판매 가능한가요?",
-                      a: "아니요, SoulFrame은 Soulbound NFT로 거래나 이전이 불가능합니다. 당신의 고유한 디지털 신원을 나타냅니다.",
+                      q: "Can I sell my SoulFrame NFT?",
+                      a: "No, SoulFrame is a Soulbound NFT and cannot be transferred or traded. It represents your unique digital identity.",
                     },
                     {
-                      q: "어떤 블록체인을 지원하나요?",
-                      a: "현재 이더리움과 폴리곤을 지원하며, 향후 더 많은 체인을 추가할 예정입니다.",
+                      q: "Which blockchains are supported?",
+                      a: "Currently supports Ethereum and Polygon. More chains will be added in the future.",
                     },
                   ].map((item, i) => (
                     <motion.div
@@ -730,7 +1016,10 @@ export default function Home() {
                       transition={{ delay: i * 0.1 }}
                       className="bg-[#1A1B1E] rounded-xl p-5"
                     >
-                      <h4 className="font-bold text-lg mb-2 text-white">
+                      <h4
+                        className="font-bold text-lg mb-2"
+                        style={{ color: "#934406" }}
+                      >
                         {item.q}
                       </h4>
                       <p className="text-white/80 text-sm">{item.a}</p>
@@ -742,11 +1031,11 @@ export default function Home() {
               {/* Community Section */}
               <div>
                 <h3 className="text-2xl font-bold mb-6 text-white">
-                  커뮤니티 참여
+                  Join the Community
                 </h3>
                 <div className="bg-[#1A1B1E] rounded-xl p-8 text-white">
                   <p className="mb-6">
-                    SoulFrame 커뮤니티에 참여하고 최신 소식을 받아보세요.
+                    Join the SoulFrame community and get the latest updates.
                   </p>
 
                   <div className="grid grid-cols-2 gap-4 mb-8">
@@ -767,15 +1056,15 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <h4 className="font-bold mb-3">뉴스레터 구독</h4>
+                    <h4 className="font-bold mb-3">Subscribe to Newsletter</h4>
                     <div className="flex gap-2">
                       <input
                         type="email"
-                        placeholder="이메일 입력"
+                        placeholder="Enter your email"
                         className="rounded-lg bg-[#121417] border border-white/20 p-2 flex-grow text-white"
                       />
-                      <button className="bg-blue-500 hover:bg-blue-600 rounded-lg px-4 py-2 font-medium">
-                        구독
+                      <button className="bg-[#934406] hover:bg-[#b85a0a] rounded-lg px-4 py-2 font-medium text-white">
+                        Subscribe
                       </button>
                     </div>
                   </div>
