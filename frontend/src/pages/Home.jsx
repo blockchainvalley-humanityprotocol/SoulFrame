@@ -4,15 +4,10 @@ import { motion } from "framer-motion";
 import {
   FiKey,
   FiShield,
-  FiUser,
   FiCheckCircle,
   FiCpu,
-  FiUsers,
-  FiArrowRight,
   FiActivity,
   FiLock,
-  FiClock,
-  FiAlertCircle,
 } from "react-icons/fi";
 import LocomotiveScroll from "locomotive-scroll";
 import "locomotive-scroll/dist/locomotive-scroll.css";
