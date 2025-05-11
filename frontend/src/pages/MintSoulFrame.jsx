@@ -1,180 +1,86 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import character1 from "../assets/character_1.jpeg";
+import { useNavigate } from "react-router-dom";
 import { getAISummary } from "../api/elizaos";
-import { isKycVerified } from "../api/humanity";
 import { usePrivy } from "@privy-io/react-auth";
 
 export default function MintSoulFrame() {
   const { user } = usePrivy();
   // 실제 SBT 체크 및 NFT 민팅 로직은 추후 구현
   const [hasSBT, setHasSBT] = useState(false); // 실제 인증 결과 반영
+  // 프론트에서만 사용하는 인증 시뮬레이션 state
+  const [isVerified, setIsVerified] = useState(false);
   const [minted, setMinted] = useState(false); // 실제 민팅 여부
   const [metadata, setMetadata] = useState(null); // NFT 메타데이터
   const [showModal, setShowModal] = useState(false); // 민팅 성공 모달
 
   // 입력값 상태
-  const [intro, setIntro] = useState("");
   const [traits, setTraits] = useState("");
-  const [chatStyle, setChatStyle] = useState("");
+  const [interests, setInterests] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [uploadedImage, setUploadedImage] = useState(null); // 유저가 업로드한 이미지
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
 
   const navigate = useNavigate();
 
   // NFT 발행 핸들러
-  const handleMint = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      // 현재 로그인된 privy wallet address를 subject_address로 사용
-      const address = user?.wallet?.address;
-      if (!address) throw new Error("지갑 주소를 찾을 수 없습니다. 로그인 상태를 확인해 주세요.");
-      // 1. KYC 인증 여부 확인
-      // (임시) Humanity API를 사용할 수 없으므로 무조건 인증된 것으로 처리
-      const verified = true;
-      setHasSBT(true);
-      // 아래 코드는 실제 API 사용 시 복구
-      // const verified = await isKycVerified(address);
-      // setHasSBT(verified);
-      // if (!verified) {
-      //   setError("Humanity KYC 인증이 필요합니다. 인증 후 다시 시도해 주세요.");
-      //   setLoading(false);
-      //   return;
-      // }
-      // 2. elizaos agent 생성 (id/summary/image/character 반환)
-      const aiRes = await getAISummary({
-        trait: traits,
-        interest: chatStyle,
-        intro,
-      });
-      // 이미지: 업로드한 이미지가 있으면 그걸 사용, 없으면 elizaos 결과 사용
-      const finalImage = uploadedImageUrl || aiRes.image;
-      setMetadata({ ...aiRes, image: finalImage });
-      // 민팅 성공 시 localStorage에 ainft 정보 저장
-      window.localStorage.setItem("mysoulframe", JSON.stringify({
-        agentId: aiRes.id,
-        image: finalImage,
-        summary: aiRes.summary,
-        character: aiRes.character,
-        traits,
-        intro,
-        chatStyle,
-        wallet: address
-      }));
-      setMinted(true);
+  const handleMint = () => {
+    // 입력값만 있으면 바로 모달 오픈
+    if (traits && interests) {
       setShowModal(true);
-    } catch (e) {
-      setError("NFT 발행 중 오류가 발생했습니다. 다시 시도해 주세요.");
-    } finally {
-      setLoading(false);
+      setMetadata({ summary: "AI가 생성한 요약입니다." }); // summary 더미값
+      setMinted(true);
+      setError(null);
+    } else {
+      setError("성격과 관심사를 입력해 주세요.");
     }
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-[#f6fff2] via-[#e6f7e6] to-[#eaf6ff] flex flex-col items-center justify-center font-sans py-12 px-2">
-      <div className="bg-white/80 rounded-3xl shadow-xl flex flex-col items-center px-8 py-10 max-w-lg w-full animate-fade-in">
-        <h2 className="text-4xl font-extrabold mb-6 text-green-700 tracking-tight text-center">
-          SoulFrame NFT 민팅
+    <div className="w-full min-h-screen bg-[#0C0E10] flex flex-col items-center justify-center font-sans py-12 px-2">
+      <div className="bg-[#1A1B1E] rounded-3xl shadow-xl flex flex-col items-center px-8 py-10 max-w-lg w-full animate-fade-in border border-white">
+        <h2 className="text-4xl font-extrabold mb-6 text-white tracking-tight text-center">
+          Mint Your Soul NFT
         </h2>
-        {!hasSBT ? (
-          <div className="bg-white/80 border border-red-200 rounded-xl px-6 py-4 text-red-500 font-bold mb-3 shadow animate-shake">
-            Humanity 인증이 필요합니다.
-          </div>
-        ) : minted ? (
-          <div className="flex flex-col items-center space-y-5 w-full">
-            <div className="relative">
-              <img
-                src={
-                  metadata?.image ||
-                  "https://placehold.co/200x200?text=AI+NFT+Image"
-                }
-                alt="NFT"
-                className="w-32 h-32 rounded-full border-4 border-green-300 shadow-xl animate-fade-in bg-white object-cover"
-              />
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-green-500 to-green-700 text-white rounded-full text-xs font-bold shadow animate-pulse">
-                SoulFrame NFT
-              </span>
-            </div>
-            <div className="bg-white/80 border border-green-200 rounded-xl p-4 text-center text-green-900 font-semibold text-lg shadow animate-fade-in-slow">
-              <div className="mb-1">
-                인증 완료: <span className="text-green-600 font-bold">O</span>
-              </div>
-              <div>특성: {traits}</div>
-              <div>AI 요약: {metadata?.summary}</div>
-            </div>
-          </div>
+        {!hasSBT && !isVerified ? (
+          <>
+            <button
+              className="w-full bg-[#1A1B1E] border border-white text-white px-8 py-4 rounded-xl font-bold text-xl shadow-md transition mb-6 hover:bg-[#232428]"
+              onClick={() => setIsVerified(true)}
+            >
+              Verify your humanity
+            </button>
+          </>
         ) : (
           <>
             <div className="w-full mb-4">
-              <label className="block mb-2 font-semibold">
-                NFT 이미지 업로드 (선택)
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                className="mb-2"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setUploadedImage(file);
-                    const reader = new FileReader();
-                    reader.onloadend = () => setUploadedImageUrl(reader.result);
-                    reader.readAsDataURL(file);
-                  } else {
-                    setUploadedImage(null);
-                    setUploadedImageUrl("");
-                  }
-                }}
-              />
-              {uploadedImageUrl && (
-                <img
-                  src={uploadedImageUrl}
-                  alt="미리보기"
-                  className="w-24 h-24 rounded-full border-2 border-fuchsia-300 shadow mb-2 object-cover"
-                />
-              )}
-            </div>
-            <div className="w-full mb-4">
-              <label className="block mb-2 font-semibold">자기소개</label>
-              <textarea
-                value={intro}
-                onChange={(e) => setIntro(e.target.value)}
-                className="w-full p-2 rounded"
-                rows={2}
-                placeholder="나를 한 줄로 소개해 주세요"
-              />
-            </div>
-            <div className="w-full mb-4">
-              <label className="block mb-2 font-semibold">
-                성격 키워드 (쉼표로 구분)
+              <label className="block mb-2 font-semibold text-white">
+                성격 (쉼표로 구분)
               </label>
               <input
                 value={traits}
                 onChange={(e) => setTraits(e.target.value)}
-                className="w-full p-2 rounded"
-                placeholder="예: 분석적, 창의적, 친화적"
+                className="w-full p-2 rounded bg-[#232428] text-white placeholder-white border border-white focus:outline-none"
+                placeholder="예: 차분함, 도전적임, 유머러스함"
               />
             </div>
             <div className="w-full mb-6">
-              <label className="block mb-2 font-semibold">
-                선호하는 대화 스타일
+              <label className="block mb-2 font-semibold text-white">
+                관심사/취미 (쉼표로 구분)
               </label>
               <input
-                value={chatStyle}
-                onChange={(e) => setChatStyle(e.target.value)}
-                className="w-full p-2 rounded"
-                placeholder="예: 논리적, 따뜻한, 유머러스"
+                value={interests}
+                onChange={(e) => setInterests(e.target.value)}
+                className="w-full p-2 rounded bg-[#232428] text-white placeholder-white border border-white focus:outline-none"
+                placeholder="예: 음악, 독서, 투자"
               />
             </div>
             {error && (
               <div className="text-red-400 font-bold mb-3">{error}</div>
             )}
             <button
-              className="w-full bg-green-700 hover:bg-green-800 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-md transition mb-4 disabled:opacity-60"
+              className="w-full bg-[#1A1B1E] border border-white text-white px-8 py-4 rounded-xl font-bold text-xl shadow-md transition mb-4 hover:bg-[#232428] disabled:opacity-60"
               onClick={handleMint}
-              disabled={loading || !intro || !traits || !chatStyle}
+              disabled={loading || !traits || !interests}
             >
               {loading ? "NFT 발행 중..." : "NFT 발행하기"}
             </button>
@@ -182,36 +88,35 @@ export default function MintSoulFrame() {
         )}
         {/* 민팅 성공 모달 */}
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
             <div
-              className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center animate-fade-in"
+              className="bg-[#1A1B1E] rounded-2xl shadow-2xl p-8 flex flex-col items-center animate-fade-in border border-white"
               style={{ minWidth: 320 }}
             >
-              <h3 className="text-2xl font-bold mb-4 text-indigo-700">
+              <h3 className="text-2xl font-bold mb-4 text-white">
                 🎉 NFT 발행 완료!
               </h3>
               <img
-                src={
-                  metadata?.image ||
-                  "https://placehold.co/200x200?text=AI+NFT+Image"
-                }
+                src={character1}
                 alt="NFT"
                 className="w-28 h-28 rounded-full border-4 border-fuchsia-300 shadow mb-4"
               />
-              <div className="text-center text-lg font-semibold mb-2">
-                AI 성격 요약
-              </div>
-              <div className="bg-indigo-50 px-4 py-2 rounded-xl text-indigo-900 text-center mb-4">
-                {metadata?.summary}
+              <div className="text-white text-center mb-2">
+                <div>
+                  <b>성격:</b> {traits}
+                </div>
+                <div>
+                  <b>관심사/취미:</b> {interests}
+                </div>
               </div>
               <button
-                className="mt-2 bg-gradient-to-r from-indigo-500 to-fuchsia-400 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:from-fuchsia-400 hover:to-indigo-500 transition"
+                className="mt-2 mb-2 bg-[#1A1B1E] border border-white text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-[#232428] transition"
                 onClick={() => {
                   setShowModal(false);
-                  navigate("/mysoulframe");
+                  navigate("/ai-agent");
                 }}
               >
-                마이페이지로 이동
+                AI NFT 확인하기
               </button>
             </div>
           </div>
