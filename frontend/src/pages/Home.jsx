@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FiKey,
   FiShield,
@@ -8,6 +8,7 @@ import {
   FiCpu,
   FiActivity,
   FiLock,
+  FiUsers,
 } from "react-icons/fi";
 import LocomotiveScroll from "locomotive-scroll";
 import "locomotive-scroll/dist/locomotive-scroll.css";
@@ -67,7 +68,7 @@ const trustStatusCards = [
   {
     key: "active",
     title: "Active",
-    img: "/assets/active.png",
+    img: "/assets/trust-status/green.png",
     features: [
       "모든 기능 사용 가능",
       "DAO 투표 참여",
@@ -78,7 +79,7 @@ const trustStatusCards = [
   {
     key: "idle",
     title: "Idle",
-    img: "/assets/idle.png",
+    img: "/assets/trust-status/yellow.png",
     features: [
       "기본 기능 사용",
       "제한된 DAO 참여",
@@ -89,7 +90,7 @@ const trustStatusCards = [
   {
     key: "dormant",
     title: "Dormant",
-    img: "/assets/dormant.png",
+    img: "/assets/trust-status/red.png",
     features: [
       "기본 프로필만 표시",
       "DAO 참여 불가",
@@ -99,109 +100,228 @@ const trustStatusCards = [
   },
 ];
 
-export default function Home() {
-  const scrollRef = useRef(null);
+// Custom hook for tracking scroll position
+function useScrollPosition() {
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      const scroll = new LocomotiveScroll({
-        el: scrollRef.current,
-        smooth: true,
-        lerp: 0.08,
-        direction: "vertical",
-      });
-      return () => scroll.destroy();
-    }
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  return scrollY;
+}
+
+// Section variants for animation
+const sectionVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+  exit: { opacity: 0, y: -50, transition: { duration: 0.6 } },
+};
+
+const sections = [
+  "hero",
+  "how-it-works",
+  "liveness",
+  "trust-status",
+  "ai-persona",
+  "user-flow",
+  "use-cases",
+  "roadmap",
+  "faq",
+];
+
+export default function Home() {
+  const [currentSection, setCurrentSection] = useState(0);
+  const scrollY = useScrollPosition();
+  const sectionRefs = useRef(sections.map(() => React.createRef()));
+
+  // Handle scroll position to determine active section
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = sections.findIndex((id) => id === entry.target.id);
+            setCurrentSection(index);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    // Add observer to each section
+    sectionRefs.current.forEach((ref, index) => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => {
+      sectionRefs.current.forEach((ref) => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, []);
+
+  // Navigate to specific section
+  const goToSection = (index) => {
+    const sectionRef = sectionRefs.current[index];
+    if (sectionRef && sectionRef.current) {
+      window.scrollTo({
+        top: sectionRef.current.offsetTop,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
-    <div
-      ref={scrollRef}
-      data-scroll-container
-      className="w-full min-h-screen bg-gradient-to-br from-[#0C0E10] via-[#111214] to-[#0C0E10] font-sans"
-    >
+    <div className="w-full font-sans">
+      {/* Navigation dots */}
+      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 flex flex-col gap-3">
+        {sections.map((_, index) => (
+          <button
+            key={index}
+            className={`w-3 h-3 rounded-full ${
+              currentSection === index
+                ? "bg-blue-500 scale-125"
+                : "bg-gray-400 opacity-50"
+            } transition-all duration-300`}
+            onClick={() => goToSection(index)}
+            aria-label={`Go to section ${index + 1}`}
+          />
+        ))}
+      </div>
+
       {/* Section 1: Hero / Mission Statement */}
       <section
         id="hero"
-        data-scroll-section
-        className="relative w-full h-[60vh] flex items-center justify-center bg-[#121417] text-white overflow-hidden border-b border-white/10"
+        ref={sectionRefs.current[0]}
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] text-white overflow-hidden snap-start"
       >
-        <div
-          className="w-full h-full flex items-center justify-center"
-          data-scroll
-          data-scroll-sticky
-          data-scroll-target="#hero"
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 0 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="container mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-10"
         >
-          <div className="flex flex-col items-center">
-            <h1
-              className="text-5xl md:text-7xl font-extrabold text-white text-center mb-4 leading-relaxed"
-              data-scroll
-              data-scroll-direction="horizontal"
-              data-scroll-speed="3"
-            >
+          <div className="flex-1 text-left md:pr-8 order-2 md:order-1">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
               Prove you're alive.
               <br />
               Own your identity.
               <br />
-              <span className="text-4xl md:text-5xl block mt-2">
+              <span className="text-3xl md:text-4xl block mt-3 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">
                 Live as an AI-powered persona
               </span>
             </h1>
+            <p className="text-lg md:text-xl text-blue-200 mb-8">
+              SoulFrame is the first liveness-based identity system on-chain.
+            </p>
             <Link to="/create-profile">
-              <button className="mt-8 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl px-8 py-4 text-lg shadow-lg transition">
+              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl px-8 py-3 text-lg shadow-lg transition">
                 Start your SoulFrame
               </button>
             </Link>
           </div>
-        </div>
+          <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2 mb-8 md:mb-0">
+            <div className="relative w-64 h-64 md:w-96 md:h-96">
+              <img
+                src="/assets/handzz.jpg"
+                alt="Holographic Hand"
+                className="w-full h-full object-contain rounded-lg drop-shadow-2xl"
+              />
+              <div className="absolute -inset-1 bg-blue-500/20 rounded-xl blur-xl -z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-blue-500/10 rounded-xl"></div>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Section 2: How SoulFrame Works */}
       <section
-        data-scroll-section
-        className="py-24 border-b border-white/10 bg-[#121417]"
+        id="how-it-works"
+        ref={sectionRefs.current[1]}
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] text-white overflow-hidden snap-start"
       >
-        <h2 className="text-3xl font-bold text-center mb-12 text-white">
-          How SoulFrame Works
-        </h2>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-          {[
-            { icon: <FiKey />, title: "지갑 연결", speed: "2" },
-            { icon: <FiShield />, title: "Humanity 인증", speed: "1" },
-            { icon: <FiCpu />, title: "AI 프로필", speed: "-1" },
-            { icon: <FiCheckCircle />, title: "NFT 발행", speed: "-2" },
-          ].map((card, i) => (
-            <div
-              key={card.title}
-              className="bg-[#1A1B1E] rounded-3xl shadow-xl p-10 flex flex-col items-center border border-white/10"
-              data-scroll
-              data-scroll-speed={card.speed}
-            >
-              <div className="text-3xl text-white mb-2">{card.icon}</div>
-              <div className="text-xl font-bold text-white mb-1">
-                {card.title}
-              </div>
-            </div>
-          ))}
-        </div>
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 1 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-7xl mx-auto px-6"
+        >
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            How SoulFrame Works
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[
+              {
+                icon: <FiKey />,
+                title: "지갑 연결",
+                desc: "Connect your wallet to start the process",
+              },
+              {
+                icon: <FiShield />,
+                title: "Humanity 인증",
+                desc: "Verify your humanity through liveness check",
+              },
+              {
+                icon: <FiCpu />,
+                title: "AI 프로필",
+                desc: "Generate your AI-powered digital identity",
+              },
+              {
+                icon: <FiCheckCircle />,
+                title: "NFT 발행",
+                desc: "Mint your soulbound NFT identity",
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="bg-[#1A1B1E] rounded-3xl shadow-xl p-8 flex flex-col items-center border border-white/10"
+              >
+                <div className="text-3xl text-blue-400 mb-4">{card.icon}</div>
+                <div className="text-xl font-bold text-white mb-2">
+                  {card.title}
+                </div>
+                <p className="text-sm text-center text-white/60">{card.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </section>
 
       {/* Section 3: Liveness 인증 */}
       <section
-        data-scroll-section
-        className="py-32 border-b border-gray-200 relative bg-white"
+        id="liveness"
+        ref={sectionRefs.current[2]}
+        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
       >
-        <div className="max-w-6xl mx-auto flex flex-col items-center gap-12">
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 2 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-6xl mx-auto px-6 flex flex-col items-center"
+        >
           <img
             src="https://muycfsrwjjlylklhfgho.supabase.co/storage/v1/object/public/images/1724824301092.png"
             alt="Liveness Vein"
-            className="w-full max-w-6xl object-contain mb-10"
+            className="w-full max-w-4xl object-contain mb-10"
           />
           <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-3xl font-bold mb-4 text-black text-center">
               How We Verify You're Alive
             </h2>
-            <p className="text-lg text-black mb-6 text-center whitespace-normal">
+            <p className="text-lg text-black mb-6 text-center">
               정맥 속 흐름으로 살아있음을 증명합니다. Humanity Protocol의 최신
               기술로 당신의 신원을 안전하게 보호합니다.
             </p>
@@ -220,44 +340,38 @@ export default function Home() {
               </li>
             </ul>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Section 4: Trust 상태 시스템 */}
       <section
-        data-scroll-section
-        className="py-24 border-b border-white/10 px-4 md:px-12 bg-[#121417]"
+        id="trust-status"
+        ref={sectionRefs.current[3]}
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] overflow-hidden snap-start"
       >
-        <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 3 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-7xl mx-auto px-6"
+        >
           <h2 className="text-3xl font-bold text-center mb-12 text-white">
-            Trust Status
+            Your Identity Has a Status
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {trustStatusCards.map((card, i) => (
               <motion.div
                 key={card.key}
                 initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.2, duration: 0.7 }}
-                viewport={{ once: true }}
                 className="flex flex-col items-center text-center"
               >
                 <img
                   src={card.img}
                   alt={card.title}
-                  className="w-32 h-32 object-contain mb-5"
+                  className="w-40 h-40 md:w-48 md:h-48 object-contain mb-5"
                 />
-                <h3
-                  className={`text-2xl font-bold mb-4 ${
-                    card.key === "active"
-                      ? "text-green-500"
-                      : card.key === "idle"
-                      ? "text-yellow-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {card.title}
-                </h3>
                 <ul className="space-y-2 text-left">
                   {card.features.map((feature, j) => (
                     <li
@@ -272,15 +386,21 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Section 5: AI Persona */}
       <section
-        data-scroll-section
-        className="py-24 border-b border-gray-200 bg-white"
+        id="ai-persona"
+        ref={sectionRefs.current[4]}
+        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
       >
-        <div className="max-w-6xl mx-auto px-4">
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 4 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-6xl mx-auto px-6"
+        >
           <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
             Create Your AI Persona
           </h2>
@@ -315,285 +435,379 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Section 6: User Flow */}
       <section
-        data-scroll-section
-        className="py-24 border-b border-white/10 bg-[#121417]"
+        id="user-flow"
+        ref={sectionRefs.current[5]}
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] text-white overflow-hidden snap-start"
       >
-        <div className="max-w-5xl mx-auto flex flex-col items-center gap-12 px-4">
-          <h2 className="text-3xl font-bold mb-8 text-white text-center">
-            User Flow
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 5 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-7xl mx-auto px-6"
+        >
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            How Users Experience SoulFrame
           </h2>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="relative">
+            {/* Timeline */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-500/30"></div>
+
+            {/* Timeline Steps */}
+            <div className="space-y-24">
+              {[
+                {
+                  title: "지갑 연결",
+                  desc: "MetaMask 또는 다른 Web3 지갑으로 로그인",
+                  icon: <FiKey className="text-2xl" />,
+                },
+                {
+                  title: "생체 인증",
+                  desc: "Humanity Protocol 기반 생체 인증 절차 완료",
+                  icon: <FiActivity className="text-2xl" />,
+                },
+                {
+                  title: "AI 페르소나",
+                  desc: "ElizaOS 기반 AI가 나만의 디지털 정체성 생성",
+                  icon: <FiCpu className="text-2xl" />,
+                },
+                {
+                  title: "NFT 발행",
+                  desc: "나만의 SoulFrame NFT 발행 및 기능 활성화",
+                  icon: <FiCheckCircle className="text-2xl" />,
+                },
+              ].map((step, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.2 }}
+                  className={`flex items-center ${
+                    i % 2 === 0 ? "flex-row" : "flex-row-reverse"
+                  }`}
+                >
+                  <div
+                    className={`w-1/2 ${
+                      i % 2 === 0 ? "text-right pr-8" : "text-left pl-8"
+                    }`}
+                  >
+                    <h3 className="text-xl font-bold text-blue-400 mb-2">
+                      {step.title}
+                    </h3>
+                    <p className="text-white/80">{step.desc}</p>
+                  </div>
+                  <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full bg-[#1E2124] border-2 border-blue-500">
+                    {step.icon}
+                  </div>
+                  <div className="w-1/2"></div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Section 7: Use Cases */}
+      <section
+        id="use-cases"
+        ref={sectionRefs.current[6]}
+        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
+      >
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 6 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-7xl mx-auto px-6"
+        >
+          <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
+            SoulFrame Use Cases
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              "지갑 연결",
-              "Humanity 인증",
-              "프로필 생성",
-              "NFT 발행",
-              "DAO 참여",
-            ].map((step, i) => (
+              {
+                title: "DAO 거버넌스",
+                desc: "진짜 인간만 DAO 투표 참여. Sybil 공격 방지.",
+                icon: <FiUsers className="text-3xl" />,
+                color: "bg-blue-100 text-blue-800",
+              },
+              {
+                title: "Web3 커뮤니티",
+                desc: "Discord, Telegram 등 Web3 커뮤니티 인증.",
+                icon: <FiUsers className="text-3xl" />,
+                color: "bg-purple-100 text-purple-800",
+              },
+              {
+                title: "토큰 에어드랍",
+                desc: "휴먼 프로필 소유자에게만 진짜 에어드랍.",
+                icon: <FiActivity className="text-3xl" />,
+                color: "bg-green-100 text-green-800",
+              },
+              {
+                title: "신원 DeFi",
+                desc: "Web3 평판과 신원 기반 DeFi 솔루션.",
+                icon: <FiLock className="text-3xl" />,
+                color: "bg-yellow-100 text-yellow-800",
+              },
+              {
+                title: "디지털 여권",
+                desc: "메타버스와 Web3 내 디지털 신원증명.",
+                icon: <FiShield className="text-3xl" />,
+                color: "bg-red-100 text-red-800",
+              },
+              {
+                title: "분산형 소셜",
+                desc: "소셜 미디어에서 실제 인간 인증.",
+                icon: <FiUsers className="text-3xl" />,
+                color: "bg-indigo-100 text-indigo-800",
+              },
+            ].map((card, i) => (
               <motion.div
-                key={step}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.15, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="flex flex-col items-center"
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                className="bg-white rounded-xl shadow-lg p-6 border border-gray-200"
               >
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-2xl font-bold text-black mb-3">
-                  {i + 1}
+                <div
+                  className={`rounded-full w-12 h-12 flex items-center justify-center mb-4 ${card.color}`}
+                >
+                  {card.icon}
                 </div>
-                <div className="text-base font-semibold text-white text-center">
-                  {step}
-                </div>
+                <h3 className="text-xl font-bold text-[#121417] mb-2">
+                  {card.title}
+                </h3>
+                <p className="text-sm text-[#121417]/70">{card.desc}</p>
               </motion.div>
             ))}
           </div>
-          <Link to="/create-profile">
-            <button className="bg-green-500 hover:bg-green-600 text-white rounded-xl px-8 py-3 font-bold mt-8">
-              Start your SoulFrame
-            </button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Section 7: Use Case 시나리오 */}
-      <section
-        data-scroll-section
-        className="py-24 border-b border-gray-200 bg-white"
-      >
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
-            Use Cases
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-2xl p-6 text-[#121417] flex flex-col items-center"
-            >
-              <span className="text-4xl mb-4">🗳️</span>
-              <h3 className="text-xl font-bold mb-2">DAO 투표 권한</h3>
-              <p className="text-sm text-center text-[#121417]/70">
-                살아있는 인간만 DAO 투표에 참여 가능합니다.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-2xl p-6 text-[#121417] flex flex-col items-center"
-            >
-              <span className="text-4xl mb-4">🎁</span>
-              <h3 className="text-xl font-bold mb-2">인증 기반 에어드랍</h3>
-              <p className="text-sm text-center text-[#121417]/70">
-                실제 인간임이 확인된 지갑에만 에어드랍 지급
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-2xl p-6 text-[#121417] flex flex-col items-center"
-            >
-              <span className="text-4xl mb-4">👥</span>
-              <h3 className="text-xl font-bold mb-2">커뮤니티 입장</h3>
-              <p className="text-sm text-center text-[#121417]/70">
-                인증된 사람만 Web3 커뮤니티에 입장 가능
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-2xl p-6 text-[#121417] flex flex-col items-center"
-            >
-              <span className="text-4xl mb-4">💼</span>
-              <h3 className="text-xl font-bold mb-2">Web3 이력서</h3>
-              <p className="text-sm text-center text-[#121417]/70">
-                검증 가능한 디지털 정체성으로 이력 증명
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-2xl p-6 text-[#121417] flex flex-col items-center"
-            >
-              <span className="text-4xl mb-4">🤖</span>
-              <h3 className="text-xl font-bold mb-2">자동매매 조건</h3>
-              <p className="text-sm text-center text-[#121417]/70">
-                인증 상태와 연동된 자동 DeFi 전략 활성화
-              </p>
-            </motion.div>
-          </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Section 8: Roadmap */}
       <section
-        data-scroll-section
-        className="py-24 border-b border-white/10 bg-[#121417]"
+        id="roadmap"
+        ref={sectionRefs.current[7]}
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] text-white overflow-hidden snap-start"
       >
-        <div className="max-w-5xl mx-auto px-4">
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 7 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-6xl mx-auto px-6"
+        >
           <h2 className="text-3xl font-bold text-center mb-12 text-white">
-            Roadmap
+            SoulFrame Roadmap
           </h2>
-          <ol className="relative border-l border-white/20 ml-4 md:ml-10">
-            <motion.li
-              className="mb-10 ml-6"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <span className="absolute -left-3 flex items-center justify-center w-6 h-6 bg-green-500 rounded-full ring-8 ring-[#0C0E10]">
-                <FiCheckCircle className="text-white" />
-              </span>
-              <h3 className="flex items-center text-xl font-semibold text-white">
-                Soulbound NFT 발행 완료
-              </h3>
-              <p className="text-white/70 mt-1">
-                이동 불가, 복제 불가 신원 NFT 시스템 구축
-              </p>
-            </motion.li>
-            <motion.li
-              className="mb-10 ml-6"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <span className="absolute -left-3 flex items-center justify-center w-6 h-6 bg-blue-500 rounded-full ring-8 ring-[#0C0E10]">
-                <FiCpu className="text-white" />
-              </span>
-              <h3 className="flex items-center text-xl font-semibold text-white">
-                AI 비서 기능 개발 중
-              </h3>
-              <p className="text-white/70 mt-1">
-                ElizaOS 기반 개인화된 AI 비서 시스템 연동
-              </p>
-            </motion.li>
-            <motion.li
-              className="mb-10 ml-6"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <span className="absolute -left-3 flex items-center justify-center w-6 h-6 bg-purple-500 rounded-full ring-8 ring-[#0C0E10]">
-                <FiActivity className="text-white" />
-              </span>
-              <h3 className="flex items-center text-xl font-semibold text-white">
-                DeFi 전략 분석 연동 예정
-              </h3>
-              <p className="text-white/70 mt-1">
-                투자 자동화 및 개인화된 포트폴리오 관리
-              </p>
-            </motion.li>
-            <motion.li
-              className="ml-6"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <span className="absolute -left-3 flex items-center justify-center w-6 h-6 bg-yellow-500 rounded-full ring-8 ring-[#0C0E10]">
-                <FiUsers className="text-white" />
-              </span>
-              <h3 className="flex items-center text-xl font-semibold text-white">
-                DAO 게이트 연동 예정
-              </h3>
-              <p className="text-white/70 mt-1">
-                주요 DAO 플랫폼과 인증 시스템 통합
-              </p>
-            </motion.li>
-          </ol>
-        </div>
+          <div className="relative pb-12">
+            {/* Horizontal line */}
+            <div className="absolute h-1 w-full bg-blue-900 top-16"></div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                {
+                  phase: "Phase 1",
+                  title: "MVP Launch",
+                  items: ["기본 생체인증", "웹 앱 베타", "MVP 출시"],
+                  status: "completed",
+                  date: "2023 Q4",
+                },
+                {
+                  phase: "Phase 2",
+                  title: "AI Integration",
+                  items: ["ElizaOS 연동", "AI 페르소나", "DAO 통합"],
+                  status: "current",
+                  date: "2024 Q2",
+                },
+                {
+                  phase: "Phase 3",
+                  title: "ID Framework",
+                  items: ["파트너십 확장", "SDK 개발", "신원 DeFi"],
+                  status: "upcoming",
+                  date: "2024 Q4",
+                },
+                {
+                  phase: "Phase 4",
+                  title: "Global Expansion",
+                  items: ["글로벌 확장", "엔터프라이즈", "웹3 표준화"],
+                  status: "upcoming",
+                  date: "2025 Q2",
+                },
+              ].map((phase, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.15, duration: 0.6 }}
+                  className="relative"
+                >
+                  {/* Circle on timeline */}
+                  <div
+                    className={`absolute left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full border-4 ${
+                      phase.status === "completed"
+                        ? "border-green-500 bg-green-500"
+                        : phase.status === "current"
+                        ? "border-blue-500 bg-blue-500"
+                        : "border-blue-900 bg-[#121417]"
+                    } top-12 z-10`}
+                  ></div>
+
+                  <div className="text-center mb-8">
+                    <span className="text-blue-400 font-bold">
+                      {phase.phase}
+                    </span>
+                  </div>
+
+                  <div
+                    className={`rounded-xl p-5 mt-10 ${
+                      phase.status === "current"
+                        ? "bg-blue-900/50 border-blue-500 border"
+                        : "bg-[#1A1B1E]"
+                    }`}
+                  >
+                    <h3 className="font-bold text-xl mb-2">{phase.title}</h3>
+                    <p className="text-sm text-blue-300 mb-3">{phase.date}</p>
+                    <ul className="space-y-2">
+                      {phase.items.map((item, j) => (
+                        <li key={j} className="text-sm flex items-center gap-2">
+                          <span
+                            className={
+                              phase.status === "completed"
+                                ? "text-green-500"
+                                : "text-white/70"
+                            }
+                          >
+                            {phase.status === "completed" ? "✓" : "•"}
+                          </span>
+                          <span className="text-white/80">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Section 9: FAQ + 커뮤니티 연결 */}
-      <section data-scroll-section className="py-24 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
+      {/* Section 9: FAQ & Community */}
+      <section
+        id="faq"
+        ref={sectionRefs.current[8]}
+        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
+      >
+        <motion.div
+          initial="hidden"
+          animate={currentSection === 8 ? "visible" : "hidden"}
+          variants={sectionVariants}
+          className="max-w-7xl mx-auto px-6"
+        >
           <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
             FAQ & Community
           </h2>
-          <div className="mb-12 space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-xl p-5 text-[#121417]"
-            >
-              <h3 className="font-bold text-lg mb-2">
-                Q. SoulFrame 인증은 어떻게 하나요?
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {/* FAQ Section */}
+            <div>
+              <h3 className="text-2xl font-bold mb-6 text-[#121417]">
+                자주 묻는 질문
               </h3>
-              <p className="text-[#121417]/80">
-                A. 지갑 연결 후, Humanity Protocol의 Liveness 인증을 거치면
-                됩니다. 전체 과정은 약 2분 소요됩니다.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-xl p-5 text-[#121417]"
-            >
-              <h3 className="font-bold text-lg mb-2">
-                Q. NFT를 다른 사람에게 전송할 수 있나요?
+              <div className="space-y-6">
+                {[
+                  {
+                    q: "왜 생체인증이 필요한가요?",
+                    a: "Sybil 공격을 방지하고 진짜 인간만 참여할 수 있는 Web3 환경을 만들기 위해서입니다.",
+                  },
+                  {
+                    q: "내 개인정보는 어떻게 보호되나요?",
+                    a: "생체 데이터는 온체인에 저장되지 않으며, 인증 과정에서만 사용됩니다. Zero-Knowledge 증명 방식으로 개인정보를 보호합니다.",
+                  },
+                  {
+                    q: "SoulFrame NFT는 판매 가능한가요?",
+                    a: "아니요, SoulFrame은 Soulbound NFT로 거래나 이전이 불가능합니다. 당신의 고유한 디지털 신원을 나타냅니다.",
+                  },
+                  {
+                    q: "어떤 블록체인을 지원하나요?",
+                    a: "현재 이더리움과 폴리곤을 지원하며, 향후 더 많은 체인을 추가할 예정입니다.",
+                  },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-[#F5F5F7] rounded-xl p-5"
+                  >
+                    <h4 className="font-bold text-lg mb-2 text-[#121417]">
+                      {item.q}
+                    </h4>
+                    <p className="text-[#121417]/80 text-sm">{item.a}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Community Section */}
+            <div>
+              <h3 className="text-2xl font-bold mb-6 text-[#121417]">
+                커뮤니티 참여
               </h3>
-              <p className="text-[#121417]/80">
-                A. SoulFrame NFT는 Soulbound로, 타인에게 전송이 불가합니다. 본인
-                신원과 영구적으로 연결됩니다.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f5f5] border border-gray-200 rounded-xl p-5 text-[#121417]"
-            >
-              <h3 className="font-bold text-lg mb-2">
-                Q. 개인정보는 안전한가요?
-              </h3>
-              <p className="text-[#121417]/80">
-                A. 네, 모든 인증은 온체인/비식별화로 처리되며 개인정보는
-                저장하지 않습니다. 오직 검증 결과만 블록체인에 기록됩니다.
-              </p>
-            </motion.div>
+              <div className="bg-[#121417] rounded-xl p-8 text-white">
+                <p className="mb-6">
+                  SoulFrame 커뮤니티에 참여하고 최신 소식을 받아보세요.
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  {[
+                    { name: "Discord", color: "bg-indigo-500" },
+                    { name: "Twitter", color: "bg-blue-400" },
+                    { name: "Telegram", color: "bg-blue-500" },
+                    { name: "GitHub", color: "bg-gray-700" },
+                  ].map((platform, i) => (
+                    <a
+                      key={i}
+                      href="#"
+                      className={`${platform.color} rounded-lg px-4 py-3 text-center font-medium hover:opacity-90 transition`}
+                    >
+                      {platform.name}
+                    </a>
+                  ))}
+                </div>
+
+                <div>
+                  <h4 className="font-bold mb-3">뉴스레터 구독</h4>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="이메일 입력"
+                      className="rounded-lg bg-white/10 border border-white/20 p-2 flex-grow text-white"
+                    />
+                    <button className="bg-blue-500 hover:bg-blue-600 rounded-lg px-4 py-2 font-medium">
+                      구독
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex justify-center gap-6">
-            <a
-              href="https://twitter.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-8 py-3 font-bold"
-            >
-              Twitter
-            </a>
-            <a
-              href="https://discord.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full px-8 py-3 font-bold"
-            >
-              Discord
-            </a>
-          </div>
-        </div>
+        </motion.div>
       </section>
+
+      {/* CSS for scroll snapping */}
+      <style jsx="true">{`
+        html {
+          scroll-snap-type: y mandatory;
+          scroll-behavior: smooth;
+        }
+        section {
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
+        }
+      `}</style>
     </div>
   );
 }
