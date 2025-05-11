@@ -231,7 +231,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2 mb-8 md:mb-0">
-            <div className="relative w-64 h-64 md:w-96 md:h-96">
+            <div className="relative w-[380px] h-[380px] md:w-[520px] md:h-[520px] md:mr-24 mr-4 flex items-center justify-center">
               <img
                 src="/assets/handzz.jpg"
                 alt="Holographic Hand"
@@ -304,7 +304,7 @@ export default function Home() {
       <section
         id="liveness"
         ref={sectionRefs.current[2]}
-        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] overflow-hidden snap-start"
       >
         <motion.div
           initial="hidden"
@@ -312,33 +312,68 @@ export default function Home() {
           variants={sectionVariants}
           className="max-w-6xl mx-auto px-6 flex flex-col items-center"
         >
-          <img
-            src="https://muycfsrwjjlylklhfgho.supabase.co/storage/v1/object/public/images/1724824301092.png"
-            alt="Liveness Vein"
-            className="w-full max-w-4xl object-contain mb-10"
-          />
+          {/* 이미지에 효과 추가 */}
+          <div className="relative w-full max-w-4xl mb-10">
+            <div className="absolute inset-0 bg-blue-500/10 rounded-3xl blur-3xl -z-10 transform scale-110"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 via-cyan-500/5 to-purple-500/10 rounded-3xl blur-2xl -z-10"></div>
+            <img
+              src="https://muycfsrwjjlylklhfgho.supabase.co/storage/v1/object/public/images/1724824301092.png"
+              alt="Liveness Vein"
+              className="w-full object-contain rounded-2xl relative z-10 filter drop-shadow-2xl"
+            />
+            {/* 반짝이는 효과 추가 */}
+            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-ping opacity-70"></div>
+            <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-cyan-400 rounded-full animate-pulse delay-1000 opacity-60"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-2 h-2 bg-purple-400 rounded-full animate-ping delay-2000 opacity-70"></div>
+          </div>
+
           <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-            <h2 className="text-3xl font-bold mb-4 text-black text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white text-center">
               How We Verify You're Alive
             </h2>
-            <p className="text-lg text-black mb-6 text-center">
-              정맥 속 흐름으로 살아있음을 증명합니다. Humanity Protocol의 최신
-              기술로 당신의 신원을 안전하게 보호합니다.
+            <p className="text-xl md:text-2xl text-white/90 mb-8 text-center leading-relaxed">
+              정맥 속 흐름으로 살아있음을 증명합니다.
+              <br />
+              <span className="text-blue-400 font-medium">
+                Humanity Protocol
+              </span>
+              의 최신 기술로 당신의 신원을 안전하게 보호합니다.
             </p>
-            <ul className="space-y-3 w-full max-w-md mx-auto text-center">
-              <li className="flex items-center justify-center gap-2 text-black/80">
-                <span className="text-green-500">✅</span>
-                <span>생체 인증 기반</span>
-              </li>
-              <li className="flex items-center justify-center gap-2 text-black/80">
-                <span className="text-green-500">🔒</span>
-                <span>개인정보 저장 안함</span>
-              </li>
-              <li className="flex items-center justify-center gap-2 text-black/80">
-                <span className="text-green-500">📡</span>
-                <span>실시간 정맥 분석</span>
-              </li>
-            </ul>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl mx-auto mt-6">
+              <div className="bg-[#1A1B1E]/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-green-500/20 hover:border-green-500/40 transition-all duration-300 flex flex-col items-center group hover:transform hover:scale-105">
+                <span className="text-4xl mb-3 transform transition-transform group-hover:scale-110">
+                  ✅
+                </span>
+                <h3 className="text-xl font-bold text-green-400 mb-2">
+                  생체 인증 기반
+                </h3>
+                <p className="text-center text-white/70">
+                  고유한 생체 정보를 활용한 안전한 인증 기술
+                </p>
+              </div>
+              <div className="bg-[#1A1B1E]/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 flex flex-col items-center group hover:transform hover:scale-105">
+                <span className="text-4xl mb-3 transform transition-transform group-hover:scale-110">
+                  🔒
+                </span>
+                <h3 className="text-xl font-bold text-blue-400 mb-2">
+                  개인정보 저장 안함
+                </h3>
+                <p className="text-center text-white/70">
+                  개인 정보는 절대 온체인에 저장되지 않습니다
+                </p>
+              </div>
+              <div className="bg-[#1A1B1E]/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 flex flex-col items-center group hover:transform hover:scale-105">
+                <span className="text-4xl mb-3 transform transition-transform group-hover:scale-110">
+                  📡
+                </span>
+                <h3 className="text-xl font-bold text-purple-400 mb-2">
+                  실시간 정맥 분석
+                </h3>
+                <p className="text-center text-white/70">
+                  최첨단 알고리즘으로 실시간 생체 데이터 처리
+                </p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </section>
@@ -393,7 +428,7 @@ export default function Home() {
       <section
         id="ai-persona"
         ref={sectionRefs.current[4]}
-        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] overflow-hidden snap-start"
       >
         <motion.div
           initial="hidden"
@@ -401,34 +436,34 @@ export default function Home() {
           variants={sectionVariants}
           className="max-w-6xl mx-auto px-6"
         >
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">
             Create Your AI Persona
           </h2>
           <div className="flex flex-col md:flex-row gap-12 items-center">
             <div className="flex-1 flex flex-col">
-              <p className="text-[#121417] mb-4">
+              <p className="text-white mb-4">
                 성향, 관심사, 한 줄 자기소개 기반 프로필 생성
               </p>
               <textarea
-                className="w-full p-4 rounded-lg bg-[#f5f5f5] border border-gray-300 text-[#121417] mb-4 min-h-[120px]"
+                className="w-full p-4 rounded-lg bg-[#1A1B1E] border border-white/10 text-white mb-4 min-h-[120px]"
                 placeholder="Web3 enthusiast, 탈중앙화와 개인정보 보호에 관심, DAOs와 DeFi에 특히 집중하는 개발자..."
               />
               <button className="bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl px-6 py-3 self-start">
                 AI 프로필 생성
               </button>
-              <p className="text-xs text-[#121417]/60 mt-2">
+              <p className="text-xs text-white/60 mt-2">
                 향후 AI Agent와 연결 예정
               </p>
             </div>
             <div className="flex-1 flex flex-col items-center">
-              <div className="w-56 h-56 rounded-full overflow-hidden flex items-center justify-center mb-6 shadow-lg border-2 border-[#121417]">
+              <div className="w-56 h-56 rounded-full overflow-hidden flex items-center justify-center mb-6 shadow-lg border-2 border-white/20">
                 <img
                   src="/assets/ai-robot.png"
                   alt="AI Persona"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="bg-[#121417] rounded-xl p-6 text-white">
+              <div className="bg-[#1A1B1E] rounded-xl p-6 text-white">
                 "Web3 builder with passion for decentralized identity solutions.
                 Actively contributes to DAO governance and values privacy-first
                 technology."
@@ -515,7 +550,7 @@ export default function Home() {
       <section
         id="use-cases"
         ref={sectionRefs.current[6]}
-        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] overflow-hidden snap-start"
       >
         <motion.div
           initial="hidden"
@@ -523,7 +558,7 @@ export default function Home() {
           variants={sectionVariants}
           className="max-w-7xl mx-auto px-6"
         >
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">
             SoulFrame Use Cases
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -532,37 +567,37 @@ export default function Home() {
                 title: "DAO 거버넌스",
                 desc: "진짜 인간만 DAO 투표 참여. Sybil 공격 방지.",
                 icon: <FiUsers className="text-3xl" />,
-                color: "bg-blue-100 text-blue-800",
+                color: "bg-[#1A1B1E] text-blue-400",
               },
               {
                 title: "Web3 커뮤니티",
                 desc: "Discord, Telegram 등 Web3 커뮤니티 인증.",
                 icon: <FiUsers className="text-3xl" />,
-                color: "bg-purple-100 text-purple-800",
+                color: "bg-[#1A1B1E] text-purple-400",
               },
               {
                 title: "토큰 에어드랍",
                 desc: "휴먼 프로필 소유자에게만 진짜 에어드랍.",
                 icon: <FiActivity className="text-3xl" />,
-                color: "bg-green-100 text-green-800",
+                color: "bg-[#1A1B1E] text-green-400",
               },
               {
                 title: "신원 DeFi",
                 desc: "Web3 평판과 신원 기반 DeFi 솔루션.",
                 icon: <FiLock className="text-3xl" />,
-                color: "bg-yellow-100 text-yellow-800",
+                color: "bg-[#1A1B1E] text-yellow-400",
               },
               {
                 title: "디지털 여권",
                 desc: "메타버스와 Web3 내 디지털 신원증명.",
                 icon: <FiShield className="text-3xl" />,
-                color: "bg-red-100 text-red-800",
+                color: "bg-[#1A1B1E] text-red-400",
               },
               {
                 title: "분산형 소셜",
                 desc: "소셜 미디어에서 실제 인간 인증.",
                 icon: <FiUsers className="text-3xl" />,
-                color: "bg-indigo-100 text-indigo-800",
+                color: "bg-[#1A1B1E] text-indigo-400",
               },
             ].map((card, i) => (
               <motion.div
@@ -570,17 +605,17 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="bg-white rounded-xl shadow-lg p-6 border border-gray-200"
+                className="bg-[#1A1B1E] rounded-xl shadow-lg p-6 border border-white/10"
               >
                 <div
                   className={`rounded-full w-12 h-12 flex items-center justify-center mb-4 ${card.color}`}
                 >
                   {card.icon}
                 </div>
-                <h3 className="text-xl font-bold text-[#121417] mb-2">
+                <h3 className="text-xl font-bold text-white mb-2">
                   {card.title}
                 </h3>
-                <p className="text-sm text-[#121417]/70">{card.desc}</p>
+                <p className="text-sm text-white/70">{card.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -698,7 +733,7 @@ export default function Home() {
       <section
         id="faq"
         ref={sectionRefs.current[8]}
-        className="relative w-full h-screen flex items-center justify-center bg-white overflow-hidden snap-start"
+        className="relative w-full h-screen flex items-center justify-center bg-[#121417] overflow-hidden snap-start"
       >
         <motion.div
           initial="hidden"
@@ -706,14 +741,14 @@ export default function Home() {
           variants={sectionVariants}
           className="max-w-7xl mx-auto px-6"
         >
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#121417]">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">
             FAQ & Community
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* FAQ Section */}
             <div>
-              <h3 className="text-2xl font-bold mb-6 text-[#121417]">
+              <h3 className="text-2xl font-bold mb-6 text-white">
                 자주 묻는 질문
               </h3>
               <div className="space-y-6">
@@ -740,12 +775,12 @@ export default function Home() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.1 }}
-                    className="bg-[#F5F5F7] rounded-xl p-5"
+                    className="bg-[#1A1B1E] rounded-xl p-5"
                   >
-                    <h4 className="font-bold text-lg mb-2 text-[#121417]">
+                    <h4 className="font-bold text-lg mb-2 text-white">
                       {item.q}
                     </h4>
-                    <p className="text-[#121417]/80 text-sm">{item.a}</p>
+                    <p className="text-white/80 text-sm">{item.a}</p>
                   </motion.div>
                 ))}
               </div>
@@ -753,10 +788,10 @@ export default function Home() {
 
             {/* Community Section */}
             <div>
-              <h3 className="text-2xl font-bold mb-6 text-[#121417]">
+              <h3 className="text-2xl font-bold mb-6 text-white">
                 커뮤니티 참여
               </h3>
-              <div className="bg-[#121417] rounded-xl p-8 text-white">
+              <div className="bg-[#1A1B1E] rounded-xl p-8 text-white">
                 <p className="mb-6">
                   SoulFrame 커뮤니티에 참여하고 최신 소식을 받아보세요.
                 </p>
@@ -784,7 +819,7 @@ export default function Home() {
                     <input
                       type="email"
                       placeholder="이메일 입력"
-                      className="rounded-lg bg-white/10 border border-white/20 p-2 flex-grow text-white"
+                      className="rounded-lg bg-[#121417] border border-white/20 p-2 flex-grow text-white"
                     />
                     <button className="bg-blue-500 hover:bg-blue-600 rounded-lg px-4 py-2 font-medium">
                       구독
