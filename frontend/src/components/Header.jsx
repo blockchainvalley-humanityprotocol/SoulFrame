@@ -57,10 +57,10 @@ export default function Header() {
           </span>
           SoulFrame
         </div>
-        <nav className="flex gap-6 ml-10 text-base font-semibold text-white">
-          <a href="/" className="hover:text-white hover:bg-[#232428] rounded-lg px-3 py-1 transition">Home</a>
-          <a href="/mint" className="hover:text-white hover:bg-[#232428] rounded-lg px-3 py-1 transition">Mint</a>
-          <a href="/ai-agent" className="hover:text-white hover:bg-[#232428] rounded-lg px-3 py-1 transition">My AI-NFT</a>
+        <nav className="flex gap-6 ml-10 text-base font-semibold text-green-900">
+          <a href="/" className="hover:text-green-700 hover:bg-green-50 rounded-lg px-3 py-1 transition">Home</a>
+          <a href="/mint" className="hover:text-green-700 hover:bg-green-50 rounded-lg px-3 py-1 transition">Mint</a>
+          <a href="/ai-agent" className="hover:text-green-700 hover:bg-green-50 rounded-lg px-3 py-1 transition">My AI-NFT</a>
           <a
             href="https://docs.soulframe.io"
             target="_blank"
