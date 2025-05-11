@@ -50,7 +50,7 @@ export default function Header() {
   }, [open]);
 
   return (
-    <header className="w-full flex items-center justify-between px-8 py-4 bg-[#0C0E10] border-b border-white/10 shadow-md z-50 font-sans">
+    <header className="w-full flex items-center justify-between px-8 py-4 bg-[#0C0E10] border-b border-white/10 shadow-md font-sans fixed top-0 left-0 z-[1000] w-screen" style={{width: '100%'}}>
       <div className="flex items-center gap-3">
         <div className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2 drop-shadow-glow">
           <img src={Logo} alt="SoulFrame Logo" className="w-40 h-15" />
@@ -186,6 +186,7 @@ export default function Header() {
     .animate-fade-in { animation: fadeIn 1.2s cubic-bezier(.4,0,.2,1) both; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: none; } }
   `}</style>
+  {/* 헤더가 fixed이므로, 메인 컨텐츠에 padding-top을 추가하세요. (예: pt-24) */}
     </header>
   );
 }
