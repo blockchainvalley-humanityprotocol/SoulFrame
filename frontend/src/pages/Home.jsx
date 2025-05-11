@@ -8,6 +8,7 @@ import {
   FiCpu,
   FiActivity,
   FiLock,
+  FiUsers,
 } from "react-icons/fi";
 import LocomotiveScroll from "locomotive-scroll";
 import "locomotive-scroll/dist/locomotive-scroll.css";
